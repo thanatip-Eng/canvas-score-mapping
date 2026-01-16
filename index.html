@@ -543,26 +543,49 @@
             updateSteps();
         };
 
-        // Export CSV
+        // Export CSV - เฉพาะ column A-F และ Assignment ที่เลือก
         document.getElementById('btnExport').onclick = () => {
             if (!mappingResult) return;
-            const newRows = canvasData.rows.map(r => [...r]);
-            mappingResult.results.forEach(r => {
-                if (r.newScore !== null && newRows[r.rowIndex]) {
-                    newRows[r.rowIndex][mappingResult.assignmentIdx] = r.newScore;
+            
+            const assignmentIdx = mappingResult.assignmentIdx;
+            const assignmentName = canvasData.headers[assignmentIdx];
+            
+            // สร้าง headers: A-F (index 0-5) + Assignment ที่เลือก
+            const exportHeaders = [
+                ...canvasData.headers.slice(0, 6),
+                assignmentName
+            ];
+            
+            // สร้าง rows
+            const exportRows = [];
+            const startRow = canvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 0 : -1;
+            
+            canvasData.rows.forEach((row, ri) => {
+                const newRow = [
+                    ...row.slice(0, 6),
+                    ''
+                ];
+                
+                // หา result ที่ตรงกับ row นี้
+                const result = mappingResult.results.find(r => r.rowIndex === ri);
+                if (result && result.newScore !== null) {
+                    newRow[6] = result.newScore;
+                } else {
+                    newRow[6] = row[assignmentIdx] || '';
                 }
+                
+                exportRows.push(newRow);
             });
 
-            let csv = canvasData.headers.map(h => {
-                const v = String(h || '');
-                return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
-            }).join(',') + '\n';
-
-            newRows.forEach(row => {
-                csv += row.map(c => {
-                    const v = String(c || '');
-                    return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
-                }).join(',') + '\n';
+            // สร้าง CSV
+            const escapeCSV = (val) => {
+                const v = String(val || '');
+                return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+            };
+            
+            let csv = exportHeaders.map(escapeCSV).join(',') + '\n';
+            exportRows.forEach(row => {
+                csv += row.map(escapeCSV).join(',') + '\n';
             });
 
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
