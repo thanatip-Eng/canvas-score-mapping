@@ -160,12 +160,17 @@
         <div class="card" id="step1">
             <h2>1️⃣ อัพโหลดไฟล์ Grade จาก Canvas</h2>
             <p class="hint">ดาวน์โหลดไฟล์ Grades จาก Canvas (Gradebook > Export) ในรูปแบบ CSV หรือ Excel</p>
+            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+                📌 ไฟล์ Canvas จะมี columns: Student, ID, SIS User ID, SIS Login ID, Integration ID, Section, แล้วตามด้วย Assignments
+            </div>
             <label class="upload-zone" id="canvasZone">
                 <input type="file" id="canvasFile" accept=".csv,.xlsx,.xls">
                 <div class="icon">📁</div>
                 <div id="canvasName">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
                 <div class="info" id="canvasInfo">รองรับ .csv, .xlsx</div>
             </label>
+            <div id="canvasPreview" class="hidden" style="margin-top:1rem; padding:0.75rem; background:rgba(255,255,255,0.03); border-radius:8px; font-size:0.8rem;"></div>
+            <div id="canvasError" class="error-msg hidden"></div>
             <div style="margin-top:1rem;">
                 <button class="btn" id="btnNext1" disabled>ถัดไป →</button>
             </div>
@@ -326,8 +331,27 @@
         canvasFileEl.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+            const previewEl = document.getElementById('canvasPreview');
+            const errorEl = document.getElementById('canvasError');
+            previewEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+            
             try {
                 canvasData = await parseFile(file);
+                
+                // ตรวจสอบว่าเป็นไฟล์ Canvas จริงหรือไม่
+                const headers = canvasData.headers.map(h => (h || '').toLowerCase());
+                const isCanvasFile = headers[0] === 'student' && 
+                                    (headers[1] === 'id' || headers[2]?.includes('sis'));
+                
+                if (!isCanvasFile) {
+                    errorEl.innerHTML = '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>';
+                    errorEl.classList.remove('hidden');
+                    canvasZone.classList.remove('has-file');
+                    document.getElementById('btnNext1').disabled = true;
+                    return;
+                }
+                
                 // Extract assignments from column G (index 6) onwards
                 // Canvas assignments มีรหัสตัวเลขในวงเล็บท้ายชื่อ เช่น "Assignment Name (123456)"
                 // กรอง column สรุปของ Canvas ออก (Points, Score, read only, Current, Final, Unposted)
@@ -346,10 +370,28 @@
                         }
                     }
                 });
+                
+                // แสดง preview
+                previewEl.innerHTML = `
+                    <div style="color:#4fd1c5; margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
+                    <div>📋 Columns: ${canvasData.headers.slice(0, 6).join(', ')}</div>
+                    <div style="margin-top:0.5rem;">📝 Assignments ที่พบ (${assignments.length}):</div>
+                    <ul style="margin:0.25rem 0 0 1.25rem; color:#a0aec0;">
+                        ${assignments.slice(0, 5).map(a => `<li>${a.name}</li>`).join('')}
+                        ${assignments.length > 5 ? `<li>... และอีก ${assignments.length - 5} รายการ</li>` : ''}
+                    </ul>
+                `;
+                previewEl.classList.remove('hidden');
+                
                 canvasZone.classList.add('has-file');
                 document.getElementById('canvasName').innerHTML = `<span class="filename">${file.name}</span>`;
                 document.getElementById('canvasInfo').textContent = `พบ ${assignments.length} assignments`;
-                document.getElementById('btnNext1').disabled = false;
+                document.getElementById('btnNext1').disabled = assignments.length === 0;
+                
+                if (assignments.length === 0) {
+                    errorEl.textContent = '⚠️ ไม่พบ Assignment ในไฟล์ (อาจเป็นไฟล์ว่างหรือรูปแบบไม่ถูกต้อง)';
+                    errorEl.classList.remove('hidden');
+                }
             } catch (err) {
                 alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
             }
