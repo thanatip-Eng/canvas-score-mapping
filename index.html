@@ -329,10 +329,21 @@
             try {
                 canvasData = await parseFile(file);
                 // Extract assignments from column G (index 6) onwards
+                // Canvas assignments มีรหัสตัวเลขในวงเล็บท้ายชื่อ เช่น "Assignment Name (123456)"
+                // กรอง column สรุปของ Canvas ออก (Points, Score, read only, Current, Final, Unposted)
                 assignments = [];
+                const excludePatterns = ['current point', 'final point', 'current score', 'final score', 
+                                        'unposted', 'read only', 'imported assignment'];
                 canvasData.headers.forEach((h, i) => {
-                    if (i >= 6 && h && !h.toLowerCase().includes('point') && !h.toLowerCase().includes('score') && !h.includes('read only')) {
-                        assignments.push({ index: i, name: h });
+                    if (i >= 6 && h) {
+                        const lower = h.toLowerCase();
+                        // ตรวจสอบว่าไม่ใช่ column สรุป
+                        const isExcluded = excludePatterns.some(p => lower.includes(p));
+                        // Assignment จะมีรหัสในวงเล็บ เช่น (123456) หรือไม่มี pattern ที่ต้องกรอง
+                        const hasAssignmentId = /\(\d+\)/.test(h);
+                        if (!isExcluded && (hasAssignmentId || !lower.includes('point') && !lower.includes('score'))) {
+                            assignments.push({ index: i, name: h });
+                        }
                     }
                 });
                 canvasZone.classList.add('has-file');
