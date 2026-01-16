@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Grade Mapper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Sarabun', 'Segoe UI', sans-serif;
+            color: #e4e4e7;
+            padding: 1.5rem;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 2.5rem; }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4fd1c5, #63b3ed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle { color: #a0aec0; font-size: 1rem; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+        }
+        .card:hover { border-color: rgba(79,209,197,0.3); }
+        .card h2 { font-size: 1.15rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        .card p.hint { color: #a0aec0; font-size: 0.85rem; margin-bottom: 1rem; }
+        .upload-zone {
+            border: 2px dashed rgba(79,209,197,0.4);
+            border-radius: 12px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(79,209,197,0.02);
+        }
+        .upload-zone:hover {
+            border-color: #4fd1c5;
+            background: rgba(79,209,197,0.08);
+            transform: translateY(-2px);
+        }
+        .upload-zone.has-file { border-color: #48bb78; background: rgba(72,187,120,0.1); }
+        .upload-zone input { display: none; }
+        .upload-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .upload-zone .filename { font-weight: 600; color: #48bb78; }
+        .upload-zone .info { color: #a0aec0; font-size: 0.85rem; margin-top: 0.25rem; }
+        .btn {
+            background: linear-gradient(135deg, #4fd1c5, #38b2ac);
+            color: #1a1a2e;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: inherit;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,209,197,0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #e4e4e7; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); box-shadow: none; }
+        select, input[type="number"] {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #e4e4e7;
+            padding: 0.7rem 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            width: 100%;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        select:focus, input:focus { outline: none; border-color: #4fd1c5; box-shadow: 0 0 0 3px rgba(79,209,197,0.2); }
+        label.field { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
+        .form-group { margin-bottom: 1.25rem; }
+        .radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .radio-option {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 180px;
+        }
+        .radio-option:hover { border-color: rgba(79,209,197,0.4); }
+        .radio-option.selected { border-color: #4fd1c5; background: rgba(79,209,197,0.1); }
+        .radio-option .title { font-weight: 600; margin-bottom: 0.3rem; }
+        .radio-option .desc { font-size: 0.8rem; color: #a0aec0; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .stat-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: #4fd1c5; }
+        .stat-value.green { color: #48bb78; }
+        .stat-value.red { color: #fc8181; }
+        .stat-label { color: #a0aec0; font-size: 0.8rem; margin-top: 0.25rem; }
+        .table-wrap { overflow-x: auto; margin-top: 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 0.7rem 0.6rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        th { background: rgba(79,209,197,0.1); font-weight: 600; color: #4fd1c5; white-space: nowrap; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .matched { color: #48bb78; }
+        .not-found { color: #fc8181; }
+        .error-msg { background: rgba(252,129,129,0.15); border: 1px solid rgba(252,129,129,0.3); color: #fc8181; padding: 0.75rem 1rem; border-radius: 8px; margin: 0.75rem 0; font-size: 0.9rem; }
+        .step-nav { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .step-dot {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 600; font-size: 0.9rem;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .step-dot.active { background: #4fd1c5; color: #1a1a2e; border-color: #4fd1c5; }
+        .step-dot.done { background: #48bb78; color: #1a1a2e; border-color: #48bb78; }
+        .hidden { display: none !important; }
+        .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.85rem; }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .radio-group { flex-direction: column; }
+            h1 { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Canvas Grade Mapper</h1>
+            <p class="subtitle">นำเข้าคะแนนจากไฟล์ภายนอกเข้าสู่ระบบ Canvas LMS</p>
+        </header>
+
+        <div class="step-nav">
+            <div class="step-dot active" id="dot1">1</div>
+            <div class="step-dot" id="dot2">2</div>
+            <div class="step-dot" id="dot3">3</div>
+            <div class="step-dot" id="dot4">4</div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="card" id="step1">
+            <h2>1️⃣ อัพโหลดไฟล์ Grade จาก Canvas</h2>
+            <p class="hint">ดาวน์โหลดไฟล์ Grades จาก Canvas (Gradebook > Export) ในรูปแบบ CSV หรือ Excel</p>
+            <label class="upload-zone" id="canvasZone">
+                <input type="file" id="canvasFile" accept=".csv,.xlsx,.xls">
+                <div class="icon">📁</div>
+                <div id="canvasName">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <div class="info" id="canvasInfo">รองรับ .csv, .xlsx</div>
+            </label>
+            <div style="margin-top:1rem;">
+                <button class="btn" id="btnNext1" disabled>ถัดไป →</button>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="card hidden" id="step2">
+            <h2>2️⃣ อัพโหลดไฟล์คะแนน</h2>
+            <p class="hint">ไฟล์ต้องมี ID หรือ Email (หรือทั้งสอง) - หากมีทั้งสองจะใช้ Email เป็นหลัก</p>
+            <div id="errorBox" class="error-msg hidden"></div>
+            <label class="upload-zone" id="scoreZone">
+                <input type="file" id="scoreFile" accept=".csv,.xlsx,.xls">
+                <div class="icon">📊</div>
+                <div id="scoreName">คลิกเพื่อเลือกไฟล์คะแนน</div>
+                <div class="info" id="scoreInfo">รองรับ .csv, .xlsx</div>
+            </label>
+            <div style="margin-top:1rem;">
+                <button class="btn btn-secondary" id="btnBack2">← ย้อนกลับ</button>
+                <button class="btn" id="btnNext2" disabled style="margin-left:0.5rem;">ถัดไป →</button>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="card hidden" id="step3">
+            <h2>3️⃣ ตั้งค่าการ Map คะแนน</h2>
+            <div class="form-group">
+                <label class="field">เลือก Assignment ที่จะส่งคะแนนเข้า:</label>
+                <select id="assignmentSelect"></select>
+            </div>
+            <div class="form-group">
+                <label class="field">วิธีการให้คะแนน:</label>
+                <div class="radio-group">
+                    <div class="radio-option selected" id="modeScore" data-mode="score">
+                        <div class="title">📝 ใช้คะแนนจาก Column</div>
+                        <div class="desc">เลือก column ที่มีคะแนนในไฟล์</div>
+                    </div>
+                    <div class="radio-option" id="modeAttend" data-mode="attendance">
+                        <div class="title">✅ ให้คะแนนตามรายชื่อ</div>
+                        <div class="desc">ถ้ามีชื่อในไฟล์ = ได้คะแนนที่กำหนด</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" id="scoreColGroup">
+                <label class="field">เลือก Column คะแนน:</label>
+                <select id="scoreColSelect"><option value="">-- เลือก column --</option></select>
+            </div>
+            <div class="form-group hidden" id="attendScoreGroup">
+                <label class="field">คะแนนที่จะให้ (ถ้ามีชื่อในรายการ):</label>
+                <input type="number" id="attendScore" value="1" min="0" step="0.1" style="max-width:150px;">
+            </div>
+            <div>
+                <button class="btn btn-secondary" id="btnBack3">← ย้อนกลับ</button>
+                <button class="btn" id="btnMap" style="margin-left:0.5rem;">🔄 ดำเนินการ Map คะแนน</button>
+            </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="card hidden" id="step4">
+            <h2>4️⃣ ผลการ Map คะแนน</h2>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">นักศึกษาทั้งหมด</div></div>
+                <div class="stat-card"><div class="stat-value green" id="statMatched">0</div><div class="stat-label">จับคู่สำเร็จ</div></div>
+                <div class="stat-card"><div class="stat-value red" id="statNotFound">0</div><div class="stat-label">ไม่พบในไฟล์คะแนน</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ชื่อนักศึกษา</th>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>คะแนนเดิม</th>
+                            <th>คะแนนใหม่</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+            <div class="actions">
+                <button class="btn" id="btnExport">📥 ดาวน์โหลด CSV สำหรับ Import Canvas</button>
+                <button class="btn btn-secondary" id="btnReset">🔄 เริ่มใหม่</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>📌 หลังได้ไฟล์ CSV แล้ว ให้นำไป Import กลับเข้า Canvas ผ่านเมนู Grades > Import</p>
+        </footer>
+    </div>
+
+    <script>
+        // State
+        let canvasData = null;
+        let scoreData = null;
+        let assignments = [];
+        let mappingResult = null;
+        let currentStep = 1;
+        let mappingMode = 'score';
+
+        // Elements
+        const canvasFileEl = document.getElementById('canvasFile');
+        const scoreFileEl = document.getElementById('scoreFile');
+        const canvasZone = document.getElementById('canvasZone');
+        const scoreZone = document.getElementById('scoreZone');
+        const errorBox = document.getElementById('errorBox');
+
+        // Parse file (CSV or Excel)
+        function parseFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                const name = file.name.toLowerCase();
+
+                if (name.endsWith('.csv')) {
+                    reader.onload = (e) => {
+                        const text = e.target.result;
+                        const lines = text.split(/\r?\n/).map(line => {
+                            const result = [];
+                            let cell = '', inQuotes = false;
+                            for (let ch of line) {
+                                if (ch === '"') inQuotes = !inQuotes;
+                                else if (ch === ',' && !inQuotes) { result.push(cell.trim()); cell = ''; }
+                                else cell += ch;
+                            }
+                            result.push(cell.trim());
+                            return result;
+                        });
+                        resolve({ headers: lines[0] || [], rows: lines.slice(1).filter(r => r.some(c => c)) });
+                    };
+                    reader.onerror = reject;
+                    reader.readAsText(file, 'UTF-8');
+                } else {
+                    reader.onload = (e) => {
+                        const data = new Uint8Array(e.target.result);
+                        const wb = XLSX.read(data, { type: 'array' });
+                        const sheet = wb.Sheets[wb.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        resolve({ headers: (json[0] || []).map(h => h?.toString() || ''), rows: json.slice(1).map(r => r.map(c => c?.toString() || '')) });
+                    };
+                    reader.onerror = reject;
+                    reader.readAsArrayBuffer(file);
+                }
+            });
+        }
+
+        // Update step indicators
+        function updateSteps() {
+            for (let i = 1; i <= 4; i++) {
+                const dot = document.getElementById('dot' + i);
+                const card = document.getElementById('step' + i);
+                dot.classList.remove('active', 'done');
+                card.classList.add('hidden');
+                if (i < currentStep) dot.classList.add('done');
+                if (i === currentStep) { dot.classList.add('active'); card.classList.remove('hidden'); }
+            }
+        }
+
+        // Canvas file upload
+        canvasFileEl.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            try {
+                canvasData = await parseFile(file);
+                // Extract assignments from column G (index 6) onwards
+                assignments = [];
+                canvasData.headers.forEach((h, i) => {
+                    if (i >= 6 && h && !h.toLowerCase().includes('point') && !h.toLowerCase().includes('score') && !h.includes('read only')) {
+                        assignments.push({ index: i, name: h });
+                    }
+                });
+                canvasZone.classList.add('has-file');
+                document.getElementById('canvasName').innerHTML = `<span class="filename">${file.name}</span>`;
+                document.getElementById('canvasInfo').textContent = `พบ ${assignments.length} assignments`;
+                document.getElementById('btnNext1').disabled = false;
+            } catch (err) {
+                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+            }
+        });
+
+        // Score file upload
+        scoreFileEl.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            errorBox.classList.add('hidden');
+            try {
+                scoreData = await parseFile(file);
+                const headers = scoreData.headers.map(h => h.toLowerCase());
+                const hasId = headers.some(h => h === 'id' || h === 'student id' || h === 'sis user id');
+                const hasEmail = headers.some(h => h.includes('email') || h === 'sis login id');
+                if (!hasId && !hasEmail) {
+                    errorBox.textContent = '⚠️ ไฟล์คะแนนต้องมี ID หรือ Email อย่างน้อย 1 ฟิลด์';
+                    errorBox.classList.remove('hidden');
+                    scoreData = null;
+                    return;
+                }
+                scoreZone.classList.add('has-file');
+                document.getElementById('scoreName').innerHTML = `<span class="filename">${file.name}</span>`;
+                document.getElementById('scoreInfo').textContent = `พบ ${scoreData.rows.length} รายการ`;
+                document.getElementById('btnNext2').disabled = false;
+
+                // Populate score column select
+                const sel = document.getElementById('scoreColSelect');
+                sel.innerHTML = '<option value="">-- เลือก column --</option>';
+                scoreData.headers.forEach((h, i) => {
+                    if (h) sel.innerHTML += `<option value="${i}">${h}</option>`;
+                });
+                // Auto-select if has score/คะแนน
+                const autoIdx = headers.findIndex(h => h.includes('score') || h.includes('คะแนน') || h.includes('point'));
+                if (autoIdx >= 0) sel.value = autoIdx;
+            } catch (err) {
+                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+            }
+        });
+
+        // Navigation
+        document.getElementById('btnNext1').onclick = () => { currentStep = 2; updateSteps(); };
+        document.getElementById('btnBack2').onclick = () => { currentStep = 1; updateSteps(); };
+        document.getElementById('btnNext2').onclick = () => {
+            currentStep = 3;
+            updateSteps();
+            // Populate assignment select
+            const sel = document.getElementById('assignmentSelect');
+            sel.innerHTML = assignments.map(a => `<option value="${a.index}">${a.name}</option>`).join('');
+        };
+        document.getElementById('btnBack3').onclick = () => { currentStep = 2; updateSteps(); };
+
+        // Mode selection
+        document.getElementById('modeScore').onclick = function() {
+            mappingMode = 'score';
+            this.classList.add('selected');
+            document.getElementById('modeAttend').classList.remove('selected');
+            document.getElementById('scoreColGroup').classList.remove('hidden');
+            document.getElementById('attendScoreGroup').classList.add('hidden');
+        };
+        document.getElementById('modeAttend').onclick = function() {
+            mappingMode = 'attendance';
+            this.classList.add('selected');
+            document.getElementById('modeScore').classList.remove('selected');
+            document.getElementById('scoreColGroup').classList.add('hidden');
+            document.getElementById('attendScoreGroup').classList.remove('hidden');
+        };
+
+        // Perform mapping
+        document.getElementById('btnMap').onclick = () => {
+            const assignmentIdx = parseInt(document.getElementById('assignmentSelect').value);
+            const scoreColIdx = parseInt(document.getElementById('scoreColSelect').value);
+            const attendScore = parseFloat(document.getElementById('attendScore').value) || 0;
+
+            if (mappingMode === 'score' && isNaN(scoreColIdx)) {
+                alert('กรุณาเลือก Column คะแนน');
+                return;
+            }
+
+            const canvasHeaders = canvasData.headers.map(h => h.toLowerCase());
+            const scoreHeaders = scoreData.headers.map(h => h.toLowerCase());
+
+            // Find columns
+            const cIdIdx = canvasHeaders.findIndex(h => h === 'id');
+            const cSisIdx = canvasHeaders.findIndex(h => h === 'sis user id' || h === 'sis login id');
+            const cEmailIdx = canvasHeaders.findIndex(h => h.includes('email') || h === 'sis login id');
+
+            const sIdIdx = scoreHeaders.findIndex(h => h === 'id' || h === 'student id' || h === 'sis user id');
+            const sEmailIdx = scoreHeaders.findIndex(h => h.includes('email') || h === 'sis login id');
+
+            const results = [];
+            const startRow = canvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
+
+            canvasData.rows.slice(startRow).forEach((cRow, ri) => {
+                const name = cRow[0] || '';
+                const cId = cRow[cIdIdx] || '';
+                const cSis = cRow[cSisIdx] || '';
+                const cEmail = cRow[cEmailIdx] || '';
+
+                let newScore = null, matchedBy = '';
+
+                for (const sRow of scoreData.rows) {
+                    const sId = sRow[sIdIdx] || '';
+                    const sEmail = sRow[sEmailIdx] || '';
+
+                    // Priority: Email > ID
+                    if (sEmail && cEmail && sEmail.toLowerCase() === cEmail.toLowerCase()) {
+                        matchedBy = 'email';
+                        newScore = mappingMode === 'score' ? sRow[scoreColIdx] : attendScore;
+                        break;
+                    } else if (sId && (cId === sId || cSis === sId)) {
+                        matchedBy = 'id';
+                        newScore = mappingMode === 'score' ? sRow[scoreColIdx] : attendScore;
+                        break;
+                    }
+                }
+
+                results.push({
+                    rowIndex: ri + startRow,
+                    name, id: cId || cSis, email: cEmail,
+                    oldScore: cRow[assignmentIdx] || '',
+                    newScore, matchedBy,
+                    status: newScore !== null ? 'matched' : 'not_found'
+                });
+            });
+
+            mappingResult = { assignmentIdx, results };
+
+            // Update UI
+            document.getElementById('statTotal').textContent = results.length;
+            document.getElementById('statMatched').textContent = results.filter(r => r.status === 'matched').length;
+            document.getElementById('statNotFound').textContent = results.filter(r => r.status === 'not_found').length;
+
+            const tbody = document.getElementById('resultBody');
+            tbody.innerHTML = results.map(r => `
+                <tr>
+                    <td>${r.name}</td>
+                    <td>${r.id}</td>
+                    <td style="font-size:0.8rem">${r.email}</td>
+                    <td>${r.oldScore || '-'}</td>
+                    <td style="font-weight:600">${r.newScore !== null ? r.newScore : '-'}</td>
+                    <td class="${r.status === 'matched' ? 'matched' : 'not-found'}">
+                        ${r.status === 'matched' ? '✅ จับคู่สำเร็จ' : '❌ ไม่พบ'}
+                    </td>
+                </tr>
+            `).join('');
+
+            currentStep = 4;
+            updateSteps();
+        };
+
+        // Export CSV
+        document.getElementById('btnExport').onclick = () => {
+            if (!mappingResult) return;
+            const newRows = canvasData.rows.map(r => [...r]);
+            mappingResult.results.forEach(r => {
+                if (r.newScore !== null && newRows[r.rowIndex]) {
+                    newRows[r.rowIndex][mappingResult.assignmentIdx] = r.newScore;
+                }
+            });
+
+            let csv = canvasData.headers.map(h => {
+                const v = String(h || '');
+                return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
+            }).join(',') + '\n';
+
+            newRows.forEach(row => {
+                csv += row.map(c => {
+                    const v = String(c || '');
+                    return v.includes(',') || v.includes('"') ? `"${v.replace(/"/g, '""')}"` : v;
+                }).join(',') + '\n';
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `canvas_grades_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        // Reset
+        document.getElementById('btnReset').onclick = () => {
+            canvasData = scoreData = mappingResult = null;
+            assignments = [];
+            currentStep = 1;
+            canvasZone.classList.remove('has-file');
+            scoreZone.classList.remove('has-file');
+            document.getElementById('canvasName').textContent = 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง';
+            document.getElementById('canvasInfo').textContent = 'รองรับ .csv, .xlsx';
+            document.getElementById('scoreName').textContent = 'คลิกเพื่อเลือกไฟล์คะแนน';
+            document.getElementById('scoreInfo').textContent = 'รองรับ .csv, .xlsx';
+            document.getElementById('btnNext1').disabled = true;
+            document.getElementById('btnNext2').disabled = true;
+            canvasFileEl.value = '';
+            scoreFileEl.value = '';
+            updateSteps();
+        };
+
+        // Init
+        updateSteps();
+    </script>
+</body>
+</html>
