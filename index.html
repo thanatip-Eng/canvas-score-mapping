@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas Grade Mapper</title>
+    <title>Canvas Grade Mapper & Student Status Check</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -135,9 +135,61 @@
         .hidden { display: none !important; }
         .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
         footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.85rem; }
+        /* Mode selector */
+        .mode-selector { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .mode-btn {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            color: #e4e4e7;
+            font-family: inherit;
+            font-size: 0.95rem;
+            min-width: 220px;
+        }
+        .mode-btn:hover { border-color: rgba(79,209,197,0.4); background: rgba(79,209,197,0.05); }
+        .mode-btn.active { border-color: #4fd1c5; background: rgba(79,209,197,0.12); }
+        .mode-btn .mode-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .mode-btn .mode-title { font-weight: 600; }
+        .mode-btn .mode-desc { font-size: 0.8rem; color: #a0aec0; margin-top: 0.2rem; }
+        /* Status check specific */
+        .file-list { margin-top: 0.75rem; }
+        .file-item {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.05); border-radius: 8px;
+            padding: 0.5rem 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem;
+        }
+        .file-item .file-section { color: #4fd1c5; font-weight: 600; }
+        .file-item .file-remove { cursor: pointer; color: #fc8181; font-size: 0.8rem; }
+        .file-item .file-remove:hover { color: #f56565; }
+        .stats-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+        .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: rgba(72,187,120,0.2); color: #48bb78; }
+        .badge-red { background: rgba(252,129,129,0.2); color: #fc8181; }
+        .badge-yellow { background: rgba(236,201,75,0.2); color: #ecc94b; }
+        .badge-blue { background: rgba(99,179,237,0.2); color: #63b3ed; }
+        .section-group { margin-bottom: 1.5rem; }
+        .section-header {
+            font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;
+            padding: 0.5rem 0.75rem; background: rgba(79,209,197,0.1);
+            border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;
+        }
+        .filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .filter-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            color: #e4e4e7; padding: 0.4rem 0.8rem; border-radius: 8px;
+            cursor: pointer; font-size: 0.85rem; font-family: inherit; transition: all 0.2s;
+        }
+        .filter-btn:hover { border-color: rgba(79,209,197,0.4); }
+        .filter-btn.active { border-color: #4fd1c5; background: rgba(79,209,197,0.15); color: #4fd1c5; }
         @media (max-width: 600px) {
             .stats-grid { grid-template-columns: 1fr; }
+            .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
             .radio-group { flex-direction: column; }
+            .mode-selector { flex-direction: column; align-items: center; }
             h1 { font-size: 1.75rem; }
         }
     </style>
@@ -149,6 +201,22 @@
             <p class="subtitle">นำเข้าคะแนนจากไฟล์ภายนอกเข้าสู่ระบบ Canvas LMS</p>
         </header>
 
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <button class="mode-btn active" id="modeMapBtn" onclick="switchMode('map')">
+                <div class="mode-icon">📊</div>
+                <div class="mode-title">Map คะแนน</div>
+                <div class="mode-desc">นำเข้าคะแนนจากไฟล์ภายนอกเข้า Canvas</div>
+            </button>
+            <button class="mode-btn" id="modeCheckBtn" onclick="switchMode('check')">
+                <div class="mode-icon">🔍</div>
+                <div class="mode-title">ตรวจสอบสถานะนักศึกษา</div>
+                <div class="mode-desc">เทียบรายชื่อ Canvas กับสำนักทะเบียน</div>
+            </button>
+        </div>
+
+        <!-- Score Mapping Mode Steps -->
+        <div id="mapMode">
         <div class="step-nav">
             <div class="step-dot active" id="dot1">1</div>
             <div class="step-dot" id="dot2">2</div>
@@ -255,6 +323,80 @@
                 <button class="btn btn-secondary" id="btnReset">🔄 เริ่มใหม่</button>
             </div>
         </div>
+
+        </div><!-- end mapMode -->
+
+        <!-- Student Status Check Mode -->
+        <div id="checkMode" class="hidden">
+        <div class="step-nav">
+            <div class="step-dot active" id="chkDot1">1</div>
+            <div class="step-dot" id="chkDot2">2</div>
+            <div class="step-dot" id="chkDot3">3</div>
+        </div>
+
+        <!-- Check Step 1: Upload Canvas -->
+        <div class="card" id="chkStep1">
+            <h2>1️⃣ อัพโหลดไฟล์ Grade จาก Canvas</h2>
+            <p class="hint">ดาวน์โหลดไฟล์ Grades จาก Canvas (Gradebook > Export) - ไม่จำเป็นต้องมี Assignment</p>
+            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+                📌 ไฟล์ Canvas จะมี columns: Student, ID, SIS User ID, SIS Login ID, Integration ID, Section
+            </div>
+            <label class="upload-zone" id="chkCanvasZone">
+                <input type="file" id="chkCanvasFile" accept=".csv,.xlsx,.xls">
+                <div class="icon">📁</div>
+                <div id="chkCanvasName">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
+                <div class="info" id="chkCanvasInfo">รองรับ .csv, .xlsx</div>
+            </label>
+            <div id="chkCanvasPreview" class="hidden" style="margin-top:1rem; padding:0.75rem; background:rgba(255,255,255,0.03); border-radius:8px; font-size:0.8rem;"></div>
+            <div id="chkCanvasError" class="error-msg hidden"></div>
+            <div style="margin-top:1rem;">
+                <button class="btn" id="chkBtnNext1" disabled>ถัดไป →</button>
+            </div>
+        </div>
+
+        <!-- Check Step 2: Upload Registrar Files -->
+        <div class="card hidden" id="chkStep2">
+            <h2>2️⃣ อัพโหลดไฟล์รายชื่อจากสำนักทะเบียน</h2>
+            <p class="hint">ไฟล์ CSV แยกตาม section - ชื่อไฟล์: รหัสวิชา(6 ตัว) + lecture section(3 ตัว) + lab section(3 ตัว) เช่น 261111802000.csv</p>
+            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+                📌 แต่ละไฟล์ประกอบด้วย: ID, NAME, SNAME, Column1_1, FACID, FACNAME
+            </div>
+            <label class="upload-zone" id="regZone">
+                <input type="file" id="regFiles" accept=".csv,.xlsx,.xls" multiple>
+                <div class="icon">📋</div>
+                <div id="regName">คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)</div>
+                <div class="info" id="regInfo">รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน</div>
+            </label>
+            <div id="regFileList" class="file-list"></div>
+            <div id="regError" class="error-msg hidden"></div>
+            <div style="margin-top:1rem;">
+                <button class="btn btn-secondary" id="chkBtnBack2">← ย้อนกลับ</button>
+                <button class="btn" id="chkBtnCompare" disabled style="margin-left:0.5rem;">🔍 ตรวจสอบสถานะ</button>
+            </div>
+        </div>
+
+        <!-- Check Step 3: Results -->
+        <div class="card hidden" id="chkStep3">
+            <h2>3️⃣ ผลการตรวจสอบสถานะนักศึกษา</h2>
+            <div class="stats-grid-4" id="chkStatsGrid">
+                <div class="stat-card"><div class="stat-value" id="chkStatCanvas">0</div><div class="stat-label">นักศึกษาใน Canvas</div></div>
+                <div class="stat-card"><div class="stat-value" id="chkStatReg">0</div><div class="stat-label">นักศึกษาในทะเบียน</div></div>
+                <div class="stat-card"><div class="stat-value green" id="chkStatMatch">0</div><div class="stat-label">ตรงกัน (ปกติ)</div></div>
+                <div class="stat-card"><div class="stat-value red" id="chkStatIssue">0</div><div class="stat-label">มีปัญหา</div></div>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all" onclick="filterCheckResults('all')">ทั้งหมด</button>
+                <button class="filter-btn" data-filter="match" onclick="filterCheckResults('match')">✅ ตรงกัน</button>
+                <button class="filter-btn" data-filter="canvas-only" onclick="filterCheckResults('canvas-only')">⚠️ มีใน Canvas แต่ไม่มีในทะเบียน</button>
+                <button class="filter-btn" data-filter="reg-only" onclick="filterCheckResults('reg-only')">❌ มีในทะเบียน แต่ไม่มีใน Canvas</button>
+            </div>
+            <div id="chkResultsContainer"></div>
+            <div class="actions">
+                <button class="btn" id="chkBtnExport">📥 ดาวน์โหลดรายงานสถานะ CSV</button>
+                <button class="btn btn-secondary" id="chkBtnReset">🔄 เริ่มใหม่</button>
+            </div>
+        </div>
+        </div><!-- end checkMode -->
 
         <footer>
             <p>📌 หลังได้ไฟล์ CSV แล้ว ให้นำไป Import กลับเข้า Canvas ผ่านเมนู Grades > Import</p>
@@ -613,6 +755,477 @@
             canvasFileEl.value = '';
             scoreFileEl.value = '';
             updateSteps();
+        };
+
+        // ==========================================
+        // Student Status Check Mode
+        // ==========================================
+        let appMode = 'map'; // 'map' or 'check'
+        let chkCanvasData = null;
+        let registrarFiles = []; // { filename, courseCode, lecSection, labSection, data: {headers, rows} }
+        let chkCurrentStep = 1;
+        let chkResults = null; // { sections: [...], allEntries: [...] }
+        let chkCurrentFilter = 'all';
+
+        function switchMode(mode) {
+            appMode = mode;
+            document.getElementById('modeMapBtn').classList.toggle('active', mode === 'map');
+            document.getElementById('modeCheckBtn').classList.toggle('active', mode === 'check');
+            document.getElementById('mapMode').classList.toggle('hidden', mode !== 'map');
+            document.getElementById('checkMode').classList.toggle('hidden', mode !== 'check');
+            if (mode === 'check') updateChkSteps();
+        }
+
+        function updateChkSteps() {
+            for (let i = 1; i <= 3; i++) {
+                const dot = document.getElementById('chkDot' + i);
+                const card = document.getElementById('chkStep' + i);
+                dot.classList.remove('active', 'done');
+                card.classList.add('hidden');
+                if (i < chkCurrentStep) dot.classList.add('done');
+                if (i === chkCurrentStep) { dot.classList.add('active'); card.classList.remove('hidden'); }
+            }
+        }
+
+        // Parse registrar filename: e.g. "261111802000.csv" -> { courseCode: "261111", lecSection: "802", labSection: "000" }
+        function parseRegFilename(filename) {
+            const base = filename.replace(/\.[^.]+$/, ''); // remove extension
+            const match = base.match(/(\d{6})(\d{3})(\d{3})$/);
+            if (match) {
+                return { courseCode: match[1], lecSection: match[2], labSection: match[3] };
+            }
+            return null;
+        }
+
+        // Check Canvas file upload
+        document.getElementById('chkCanvasFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const previewEl = document.getElementById('chkCanvasPreview');
+            const errorEl = document.getElementById('chkCanvasError');
+            previewEl.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            try {
+                chkCanvasData = await parseFile(file);
+                const headers = chkCanvasData.headers.map(h => (h || '').toLowerCase());
+                const isCanvasFile = headers[0] === 'student' &&
+                                    (headers[1] === 'id' || headers[2]?.includes('sis'));
+
+                if (!isCanvasFile) {
+                    errorEl.innerHTML = '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>';
+                    errorEl.classList.remove('hidden');
+                    document.getElementById('chkCanvasZone').classList.remove('has-file');
+                    document.getElementById('chkBtnNext1').disabled = true;
+                    return;
+                }
+
+                // Count students (skip Points row if exists)
+                const startRow = chkCanvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
+                const studentCount = chkCanvasData.rows.length - startRow;
+
+                // Find section info from Canvas
+                const sectionIdx = headers.findIndex(h => h === 'section');
+                const sections = new Set();
+                if (sectionIdx >= 0) {
+                    chkCanvasData.rows.slice(startRow).forEach(row => {
+                        if (row[sectionIdx]) sections.add(row[sectionIdx]);
+                    });
+                }
+
+                previewEl.innerHTML = `
+                    <div style="color:#4fd1c5; margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
+                    <div>👥 นักศึกษา: ${studentCount} คน</div>
+                    ${sections.size > 0 ? `<div>📋 Sections: ${[...sections].join(', ')}</div>` : ''}
+                `;
+                previewEl.classList.remove('hidden');
+
+                document.getElementById('chkCanvasZone').classList.add('has-file');
+                document.getElementById('chkCanvasName').innerHTML = `<span class="filename">${file.name}</span>`;
+                document.getElementById('chkCanvasInfo').textContent = `พบ ${studentCount} นักศึกษา`;
+                document.getElementById('chkBtnNext1').disabled = false;
+            } catch (err) {
+                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+            }
+        });
+
+        // Registrar files upload
+        document.getElementById('regFiles').addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            const errorEl = document.getElementById('regError');
+            errorEl.classList.add('hidden');
+
+            const newFiles = [];
+            const errors = [];
+
+            for (const file of files) {
+                const sectionInfo = parseRegFilename(file.name);
+                if (!sectionInfo) {
+                    errors.push(`${file.name}: ชื่อไฟล์ไม่ตรงรูปแบบ (ต้องเป็น รหัสวิชา6ตัว + lecSection3ตัว + labSection3ตัว)`);
+                    continue;
+                }
+
+                try {
+                    const data = await parseFile(file);
+                    // Validate registrar file has ID column
+                    const headers = data.headers.map(h => (h || '').toLowerCase().trim());
+                    const hasId = headers.some(h => h === 'id');
+                    if (!hasId) {
+                        errors.push(`${file.name}: ไม่พบ column ID ในไฟล์`);
+                        continue;
+                    }
+
+                    // Check for duplicate
+                    const key = sectionInfo.courseCode + sectionInfo.lecSection + sectionInfo.labSection;
+                    const existing = registrarFiles.findIndex(f =>
+                        f.courseCode + f.lecSection + f.labSection === key);
+                    if (existing >= 0) {
+                        registrarFiles.splice(existing, 1); // replace
+                    }
+
+                    newFiles.push({
+                        filename: file.name,
+                        courseCode: sectionInfo.courseCode,
+                        lecSection: sectionInfo.lecSection,
+                        labSection: sectionInfo.labSection,
+                        data: data
+                    });
+                } catch (err) {
+                    errors.push(`${file.name}: ไม่สามารถอ่านไฟล์ได้ - ${err.message}`);
+                }
+            }
+
+            registrarFiles = registrarFiles.concat(newFiles);
+
+            if (errors.length > 0) {
+                errorEl.innerHTML = errors.map(err => '⚠️ ' + err).join('<br>');
+                errorEl.classList.remove('hidden');
+            }
+
+            updateRegFileList();
+            document.getElementById('chkBtnCompare').disabled = registrarFiles.length === 0;
+            if (registrarFiles.length > 0) {
+                document.getElementById('regZone').classList.add('has-file');
+                document.getElementById('regName').innerHTML = `<span class="filename">${registrarFiles.length} ไฟล์</span>`;
+                document.getElementById('regInfo').textContent = `คลิกเพื่อเพิ่มไฟล์`;
+            }
+        });
+
+        function updateRegFileList() {
+            const listEl = document.getElementById('regFileList');
+            if (registrarFiles.length === 0) {
+                listEl.innerHTML = '';
+                return;
+            }
+            listEl.innerHTML = registrarFiles.map((f, idx) => `
+                <div class="file-item">
+                    <div>
+                        <span class="file-section">วิชา ${f.courseCode} | Lec ${f.lecSection} | Lab ${f.labSection}</span>
+                        <span style="color:#a0aec0; margin-left:0.5rem;">(${f.data.rows.length} คน)</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span style="color:#a0aec0; font-size:0.8rem;">${f.filename}</span>
+                        <span class="file-remove" onclick="removeRegFile(${idx})">✕ ลบ</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeRegFile(idx) {
+            registrarFiles.splice(idx, 1);
+            updateRegFileList();
+            document.getElementById('chkBtnCompare').disabled = registrarFiles.length === 0;
+            if (registrarFiles.length === 0) {
+                document.getElementById('regZone').classList.remove('has-file');
+                document.getElementById('regName').textContent = 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)';
+                document.getElementById('regInfo').textContent = 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน';
+            }
+        }
+
+        // Check navigation
+        document.getElementById('chkBtnNext1').onclick = () => { chkCurrentStep = 2; updateChkSteps(); };
+        document.getElementById('chkBtnBack2').onclick = () => { chkCurrentStep = 1; updateChkSteps(); };
+
+        // Perform comparison
+        document.getElementById('chkBtnCompare').onclick = () => {
+            if (!chkCanvasData || registrarFiles.length === 0) return;
+
+            const canvasHeaders = chkCanvasData.headers.map(h => (h || '').toLowerCase());
+            const startRow = chkCanvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
+
+            // Get Canvas student info
+            const cSisIdx = canvasHeaders.findIndex(h => h === 'sis user id');
+            const cIdIdx = canvasHeaders.findIndex(h => h === 'id');
+            const cSectionIdx = canvasHeaders.findIndex(h => h === 'section');
+
+            const canvasStudents = chkCanvasData.rows.slice(startRow).map(row => ({
+                name: row[0] || '',
+                canvasId: row[cIdIdx] || '',
+                sisId: (row[cSisIdx] || '').trim(),
+                section: row[cSectionIdx] || '',
+                row: row
+            })).filter(s => s.name && s.name.toLowerCase() !== 'test student');
+
+            // Build registrar lookup per section
+            const allEntries = [];
+            const sectionResults = [];
+
+            registrarFiles.forEach(regFile => {
+                const regHeaders = regFile.data.headers.map(h => (h || '').toLowerCase().trim());
+                const regIdIdx = regHeaders.findIndex(h => h === 'id');
+                const regNameIdx = regHeaders.findIndex(h => h === 'name');
+                const regSnameIdx = regHeaders.findIndex(h => h === 'sname');
+                const regFacIdIdx = regHeaders.findIndex(h => h === 'facid');
+                const regFacNameIdx = regHeaders.findIndex(h => h === 'facname');
+
+                const sectionLabel = `วิชา ${regFile.courseCode} | Lec ${regFile.lecSection} | Lab ${regFile.labSection}`;
+
+                // Build set of registrar IDs
+                const regStudents = regFile.data.rows.map(row => ({
+                    id: (row[regIdIdx] || '').trim(),
+                    name: row[regNameIdx] || '',
+                    sname: row[regSnameIdx] || '',
+                    facId: regFacIdIdx >= 0 ? (row[regFacIdIdx] || '') : '',
+                    facName: regFacNameIdx >= 0 ? (row[regFacNameIdx] || '') : ''
+                })).filter(s => s.id);
+
+                const regIdSet = new Set(regStudents.map(s => s.id));
+                const canvasIdSet = new Set();
+
+                const matched = [];
+                const canvasOnly = [];
+                const regOnly = [];
+
+                // Check each Canvas student against this registrar section
+                canvasStudents.forEach(cs => {
+                    const csId = cs.sisId;
+                    if (!csId) return;
+                    if (regIdSet.has(csId)) {
+                        canvasIdSet.add(csId);
+                        const regStudent = regStudents.find(r => r.id === csId);
+                        matched.push({
+                            id: csId,
+                            canvasName: cs.name,
+                            regName: regStudent ? `${regStudent.name} ${regStudent.sname}` : '',
+                            canvasSection: cs.section,
+                            facName: regStudent?.facName || '',
+                            status: 'match',
+                            section: sectionLabel
+                        });
+                    }
+                });
+
+                // Registrar students not in Canvas
+                regStudents.forEach(rs => {
+                    const inCanvas = canvasStudents.some(cs => cs.sisId === rs.id);
+                    if (!inCanvas) {
+                        regOnly.push({
+                            id: rs.id,
+                            canvasName: '-',
+                            regName: `${rs.name} ${rs.sname}`,
+                            canvasSection: '-',
+                            facName: rs.facName,
+                            status: 'reg-only',
+                            section: sectionLabel
+                        });
+                    }
+                });
+
+                sectionResults.push({
+                    label: sectionLabel,
+                    filename: regFile.filename,
+                    courseCode: regFile.courseCode,
+                    lecSection: regFile.lecSection,
+                    labSection: regFile.labSection,
+                    matched, canvasOnly, regOnly,
+                    regTotal: regStudents.length
+                });
+
+                allEntries.push(...matched, ...regOnly);
+            });
+
+            // Now find Canvas students not in ANY registrar file
+            const allRegIds = new Set();
+            registrarFiles.forEach(rf => {
+                const regHeaders = rf.data.headers.map(h => (h || '').toLowerCase().trim());
+                const regIdIdx = regHeaders.findIndex(h => h === 'id');
+                rf.data.rows.forEach(row => {
+                    const id = (row[regIdIdx] || '').trim();
+                    if (id) allRegIds.add(id);
+                });
+            });
+
+            const canvasOnlyStudents = canvasStudents
+                .filter(cs => cs.sisId && !allRegIds.has(cs.sisId))
+                .map(cs => ({
+                    id: cs.sisId,
+                    canvasName: cs.name,
+                    regName: '-',
+                    canvasSection: cs.section,
+                    facName: '-',
+                    status: 'canvas-only',
+                    section: 'ไม่พบในทะเบียน'
+                }));
+
+            allEntries.push(...canvasOnlyStudents);
+
+            const totalMatched = allEntries.filter(e => e.status === 'match').length;
+            const totalCanvasOnly = canvasOnlyStudents.length;
+            const totalRegOnly = allEntries.filter(e => e.status === 'reg-only').length;
+
+            chkResults = {
+                sections: sectionResults,
+                allEntries,
+                canvasOnlyStudents,
+                canvasTotal: canvasStudents.length,
+                regTotal: registrarFiles.reduce((sum, f) => sum + f.data.rows.filter(r => r.some(c => c)).length, 0),
+                totalMatched,
+                totalIssues: totalCanvasOnly + totalRegOnly
+            };
+
+            // Update stats
+            document.getElementById('chkStatCanvas').textContent = canvasStudents.length;
+            document.getElementById('chkStatReg').textContent = chkResults.regTotal;
+            document.getElementById('chkStatMatch').textContent = totalMatched;
+            document.getElementById('chkStatIssue').textContent = chkResults.totalIssues;
+
+            // Render results
+            chkCurrentFilter = 'all';
+            renderCheckResults();
+
+            chkCurrentStep = 3;
+            updateChkSteps();
+        };
+
+        function filterCheckResults(filter) {
+            chkCurrentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            renderCheckResults();
+        }
+
+        function renderCheckResults() {
+            if (!chkResults) return;
+            const container = document.getElementById('chkResultsContainer');
+            let entries = chkResults.allEntries;
+
+            if (chkCurrentFilter !== 'all') {
+                entries = entries.filter(e => e.status === chkCurrentFilter);
+            }
+
+            // Group by section
+            const grouped = {};
+            entries.forEach(e => {
+                if (!grouped[e.section]) grouped[e.section] = [];
+                grouped[e.section].push(e);
+            });
+
+            let html = '';
+            for (const [section, items] of Object.entries(grouped)) {
+                const matchCount = items.filter(i => i.status === 'match').length;
+                const canvasOnlyCount = items.filter(i => i.status === 'canvas-only').length;
+                const regOnlyCount = items.filter(i => i.status === 'reg-only').length;
+
+                html += `<div class="section-group">`;
+                html += `<div class="section-header">
+                    📋 ${section}
+                    <span class="badge badge-green">${matchCount} ตรงกัน</span>
+                    ${canvasOnlyCount > 0 ? `<span class="badge badge-yellow">${canvasOnlyCount} เฉพาะ Canvas</span>` : ''}
+                    ${regOnlyCount > 0 ? `<span class="badge badge-red">${regOnlyCount} เฉพาะทะเบียน</span>` : ''}
+                </div>`;
+                html += `<div class="table-wrap"><table>
+                    <thead><tr>
+                        <th>รหัสนักศึกษา</th>
+                        <th>ชื่อ (Canvas)</th>
+                        <th>ชื่อ (ทะเบียน)</th>
+                        <th>Section (Canvas)</th>
+                        <th>คณะ</th>
+                        <th>สถานะ</th>
+                    </tr></thead><tbody>`;
+
+                items.forEach(item => {
+                    let statusHtml = '';
+                    if (item.status === 'match') {
+                        statusHtml = '<span class="matched">✅ ปกติ</span>';
+                    } else if (item.status === 'canvas-only') {
+                        statusHtml = '<span class="not-found">⚠️ มีใน Canvas แต่ไม่มีในทะเบียน</span>';
+                    } else if (item.status === 'reg-only') {
+                        statusHtml = '<span class="not-found">❌ มีในทะเบียน แต่ไม่มีใน Canvas</span>';
+                    }
+                    html += `<tr>
+                        <td>${item.id}</td>
+                        <td>${item.canvasName}</td>
+                        <td>${item.regName}</td>
+                        <td>${item.canvasSection}</td>
+                        <td>${item.facName}</td>
+                        <td>${statusHtml}</td>
+                    </tr>`;
+                });
+
+                html += `</tbody></table></div></div>`;
+            }
+
+            if (entries.length === 0) {
+                html = '<div style="text-align:center; color:#a0aec0; padding:2rem;">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Export check results
+        document.getElementById('chkBtnExport').onclick = () => {
+            if (!chkResults) return;
+
+            const escapeCSV = (val) => {
+                const v = String(val || '');
+                return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+            };
+
+            const headers = ['รหัสนักศึกษา', 'ชื่อ (Canvas)', 'ชื่อ (ทะเบียน)', 'Section (Canvas)', 'คณะ', 'Section (ทะเบียน)', 'สถานะ'];
+            let csv = headers.map(escapeCSV).join(',') + '\n';
+
+            chkResults.allEntries.forEach(item => {
+                let statusText = '';
+                if (item.status === 'match') statusText = 'ปกติ';
+                else if (item.status === 'canvas-only') statusText = 'มีใน Canvas แต่ไม่มีในทะเบียน';
+                else if (item.status === 'reg-only') statusText = 'มีในทะเบียน แต่ไม่มีใน Canvas';
+
+                csv += [item.id, item.canvasName, item.regName, item.canvasSection, item.facName, item.section, statusText]
+                    .map(escapeCSV).join(',') + '\n';
+            });
+
+            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `student_status_check_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        // Check mode reset
+        document.getElementById('chkBtnReset').onclick = () => {
+            chkCanvasData = null;
+            registrarFiles = [];
+            chkResults = null;
+            chkCurrentStep = 1;
+            document.getElementById('chkCanvasZone').classList.remove('has-file');
+            document.getElementById('chkCanvasName').textContent = 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง';
+            document.getElementById('chkCanvasInfo').textContent = 'รองรับ .csv, .xlsx';
+            document.getElementById('regZone').classList.remove('has-file');
+            document.getElementById('regName').textContent = 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)';
+            document.getElementById('regInfo').textContent = 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน';
+            document.getElementById('regFileList').innerHTML = '';
+            document.getElementById('chkCanvasFile').value = '';
+            document.getElementById('regFiles').value = '';
+            document.getElementById('chkBtnNext1').disabled = true;
+            document.getElementById('chkBtnCompare').disabled = true;
+            document.getElementById('chkCanvasPreview').classList.add('hidden');
+            document.getElementById('chkCanvasError').classList.add('hidden');
+            document.getElementById('regError').classList.add('hidden');
+            updateChkSteps();
         };
 
         // Init
