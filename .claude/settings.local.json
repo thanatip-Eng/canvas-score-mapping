@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx:*)",
+      "Bash(curl:*)",
+      "Bash(node -e:*)",
+      "Bash(node /tmp/validate_ids.js:*)"
+    ]
+  }
+}

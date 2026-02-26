@@ -7,12 +7,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
+        :root {
+            --color-bg-primary: #1a1a2e;
+            --color-bg-secondary: #16213e;
+            --color-bg-tertiary: #0f3460;
+            --color-accent: #4fd1c5;
+            --color-accent-dark: #38b2ac;
+            --color-accent-rgb: 79, 209, 197;
+            --color-success: #48bb78;
+            --color-success-rgb: 72, 187, 120;
+            --color-danger: #fc8181;
+            --color-danger-dark: #f56565;
+            --color-danger-rgb: 252, 129, 129;
+            --color-warning: #ecc94b;
+            --color-warning-rgb: 236, 201, 75;
+            --color-info: #63b3ed;
+            --color-info-rgb: 99, 179, 237;
+            --color-text-primary: #e4e4e7;
+            --color-text-muted: #a0aec0;
+            --color-text-footer: #64748b;
+            --color-surface: rgba(255, 255, 255, 0.05);
+            --color-surface-hover: rgba(255, 255, 255, 0.08);
+            --color-surface-active: rgba(255, 255, 255, 0.1);
+            --color-border: rgba(255, 255, 255, 0.1);
+            --color-border-light: rgba(255, 255, 255, 0.15);
+            --color-border-medium: rgba(255, 255, 255, 0.2);
+            --radius-sm: 8px;
+            --radius-md: 10px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --transition-default: all 0.3s ease;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 50%, var(--color-bg-tertiary) 100%);
             font-family: 'Sarabun', 'Segoe UI', sans-serif;
-            color: #e4e4e7;
+            color: var(--color-text-primary);
             padding: 1.5rem;
         }
         .container { max-width: 1100px; margin: 0 auto; }
@@ -20,171 +51,188 @@
         h1 {
             font-size: 2.2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #4fd1c5, #63b3ed);
+            background: linear-gradient(135deg, var(--color-accent), var(--color-info));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 0.5rem;
         }
-        .subtitle { color: #a0aec0; font-size: 1rem; }
+        .subtitle { color: var(--color-text-muted); font-size: 1rem; }
         .card {
-            background: rgba(255,255,255,0.05);
+            background: var(--color-surface);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 16px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
             padding: 1.5rem;
             margin-bottom: 1.25rem;
-            transition: all 0.3s ease;
+            transition: var(--transition-default);
         }
-        .card:hover { border-color: rgba(79,209,197,0.3); }
+        .card:hover { border-color: rgba(var(--color-accent-rgb), 0.3); }
         .card h2 { font-size: 1.15rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
-        .card p.hint { color: #a0aec0; font-size: 0.85rem; margin-bottom: 1rem; }
+        .card p.hint { color: var(--color-text-muted); font-size: 0.85rem; margin-bottom: 1rem; }
         .upload-zone {
-            border: 2px dashed rgba(79,209,197,0.4);
-            border-radius: 12px;
+            border: 2px dashed rgba(var(--color-accent-rgb), 0.4);
+            border-radius: var(--radius-lg);
             padding: 2rem 1.5rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: rgba(79,209,197,0.02);
+            transition: var(--transition-default);
+            background: rgba(var(--color-accent-rgb), 0.02);
         }
         .upload-zone:hover {
-            border-color: #4fd1c5;
-            background: rgba(79,209,197,0.08);
+            border-color: var(--color-accent);
+            background: rgba(var(--color-accent-rgb), 0.08);
             transform: translateY(-2px);
         }
-        .upload-zone.has-file { border-color: #48bb78; background: rgba(72,187,120,0.1); }
+        .upload-zone.has-file { border-color: var(--color-success); background: rgba(var(--color-success-rgb), 0.1); }
         .upload-zone input { display: none; }
         .upload-zone .icon { font-size: 2rem; margin-bottom: 0.5rem; }
-        .upload-zone .filename { font-weight: 600; color: #48bb78; }
-        .upload-zone .info { color: #a0aec0; font-size: 0.85rem; margin-top: 0.25rem; }
+        .upload-zone .filename { font-weight: 600; color: var(--color-success); }
+        .upload-zone .info { color: var(--color-text-muted); font-size: 0.85rem; margin-top: 0.25rem; }
         .btn {
-            background: linear-gradient(135deg, #4fd1c5, #38b2ac);
-            color: #1a1a2e;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+            color: var(--color-bg-primary);
             border: none;
             padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             font-weight: 600;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-default);
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
             font-family: inherit;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79,209,197,0.3); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(var(--color-accent-rgb), 0.3); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: #e4e4e7; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-secondary { background: var(--color-surface-active); color: var(--color-text-primary); border: 1px solid var(--color-border-medium); }
         .btn-secondary:hover { background: rgba(255,255,255,0.15); box-shadow: none; }
         select, input[type="number"] {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #e4e4e7;
+            background: var(--color-surface-hover);
+            border: 1px solid var(--color-border-medium);
+            color: var(--color-text-primary);
             padding: 0.7rem 1rem;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 0.95rem;
             width: 100%;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: var(--transition-default);
         }
-        select:focus, input:focus { outline: none; border-color: #4fd1c5; box-shadow: 0 0 0 3px rgba(79,209,197,0.2); }
+        select:focus, input:focus { outline: none; border-color: var(--color-accent); box-shadow: 0 0 0 3px rgba(var(--color-accent-rgb), 0.2); }
         label.field { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; }
         .form-group { margin-bottom: 1.25rem; }
         .radio-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
         .radio-option {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 10px;
+            background: var(--color-surface);
+            border: 2px solid var(--color-border-light);
+            border-radius: var(--radius-md);
             padding: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-default);
             flex: 1;
             min-width: 180px;
         }
-        .radio-option:hover { border-color: rgba(79,209,197,0.4); }
-        .radio-option.selected { border-color: #4fd1c5; background: rgba(79,209,197,0.1); }
+        .radio-option:hover { border-color: rgba(var(--color-accent-rgb), 0.4); }
+        .radio-option.selected { border-color: var(--color-accent); background: rgba(var(--color-accent-rgb), 0.1); }
         .radio-option .title { font-weight: 600; margin-bottom: 0.3rem; }
-        .radio-option .desc { font-size: 0.8rem; color: #a0aec0; }
+        .radio-option .desc { font-size: 0.8rem; color: var(--color-text-muted); }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
-        .stat-card { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 1rem; text-align: center; }
-        .stat-value { font-size: 1.75rem; font-weight: 700; color: #4fd1c5; }
-        .stat-value.green { color: #48bb78; }
-        .stat-value.red { color: #fc8181; }
-        .stat-label { color: #a0aec0; font-size: 0.8rem; margin-top: 0.25rem; }
+        .stat-card { background: var(--color-surface); border-radius: var(--radius-md); padding: 1rem; text-align: center; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--color-accent); }
+        .stat-value.green { color: var(--color-success); }
+        .stat-value.red { color: var(--color-danger); }
+        .stat-label { color: var(--color-text-muted); font-size: 0.8rem; margin-top: 0.25rem; }
         .table-wrap { overflow-x: auto; margin-top: 1rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th, td { padding: 0.7rem 0.6rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        th { background: rgba(79,209,197,0.1); font-weight: 600; color: #4fd1c5; white-space: nowrap; }
+        th { background: rgba(var(--color-accent-rgb), 0.1); font-weight: 600; color: var(--color-accent); white-space: nowrap; }
         tr:hover { background: rgba(255,255,255,0.03); }
-        .matched { color: #48bb78; }
-        .not-found { color: #fc8181; }
-        .error-msg { background: rgba(252,129,129,0.15); border: 1px solid rgba(252,129,129,0.3); color: #fc8181; padding: 0.75rem 1rem; border-radius: 8px; margin: 0.75rem 0; font-size: 0.9rem; }
+        .matched { color: var(--color-success); }
+        .not-found { color: var(--color-danger); }
+        .error-msg { background: rgba(var(--color-danger-rgb), 0.15); border: 1px solid rgba(var(--color-danger-rgb), 0.3); color: var(--color-danger); padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin: 0.75rem 0; font-size: 0.9rem; }
         .step-nav { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; }
         .step-dot {
             width: 36px; height: 36px;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 600; font-size: 0.9rem;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            transition: all 0.3s ease;
+            background: var(--color-surface-active);
+            border: 2px solid var(--color-border-medium);
+            transition: var(--transition-default);
         }
-        .step-dot.active { background: #4fd1c5; color: #1a1a2e; border-color: #4fd1c5; }
-        .step-dot.done { background: #48bb78; color: #1a1a2e; border-color: #48bb78; }
+        .step-dot.active { background: var(--color-accent); color: var(--color-bg-primary); border-color: var(--color-accent); }
+        .step-dot.done { background: var(--color-success); color: var(--color-bg-primary); border-color: var(--color-success); }
         .hidden { display: none !important; }
         .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        footer { text-align: center; margin-top: 2rem; color: #64748b; font-size: 0.85rem; }
+        footer { text-align: center; margin-top: 2rem; color: var(--color-text-footer); font-size: 0.85rem; }
         /* Mode selector */
         .mode-selector { display: flex; gap: 0.75rem; justify-content: center; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .mode-btn {
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
+            background: var(--color-surface);
+            border: 2px solid var(--color-border-light);
+            border-radius: var(--radius-lg);
             padding: 1rem 1.5rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-default);
             text-align: center;
-            color: #e4e4e7;
+            color: var(--color-text-primary);
             font-family: inherit;
             font-size: 0.95rem;
             min-width: 220px;
         }
-        .mode-btn:hover { border-color: rgba(79,209,197,0.4); background: rgba(79,209,197,0.05); }
-        .mode-btn.active { border-color: #4fd1c5; background: rgba(79,209,197,0.12); }
+        .mode-btn:hover { border-color: rgba(var(--color-accent-rgb), 0.4); background: rgba(var(--color-accent-rgb), 0.05); }
+        .mode-btn.active { border-color: var(--color-accent); background: rgba(var(--color-accent-rgb), 0.12); }
         .mode-btn .mode-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
         .mode-btn .mode-title { font-weight: 600; }
-        .mode-btn .mode-desc { font-size: 0.8rem; color: #a0aec0; margin-top: 0.2rem; }
+        .mode-btn .mode-desc { font-size: 0.8rem; color: var(--color-text-muted); margin-top: 0.2rem; }
         /* Status check specific */
         .file-list { margin-top: 0.75rem; }
         .file-item {
             display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.05); border-radius: 8px;
+            background: var(--color-surface); border-radius: var(--radius-sm);
             padding: 0.5rem 0.75rem; margin-bottom: 0.4rem; font-size: 0.85rem;
         }
-        .file-item .file-section { color: #4fd1c5; font-weight: 600; }
-        .file-item .file-remove { cursor: pointer; color: #fc8181; font-size: 0.8rem; }
-        .file-item .file-remove:hover { color: #f56565; }
+        .file-item .file-section { color: var(--color-accent); font-weight: 600; }
+        .file-item .file-remove { cursor: pointer; color: var(--color-danger); font-size: 0.8rem; }
+        .file-item .file-remove:hover { color: var(--color-danger-dark); }
         .stats-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
         .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
-        .badge-green { background: rgba(72,187,120,0.2); color: #48bb78; }
-        .badge-red { background: rgba(252,129,129,0.2); color: #fc8181; }
-        .badge-yellow { background: rgba(236,201,75,0.2); color: #ecc94b; }
-        .badge-blue { background: rgba(99,179,237,0.2); color: #63b3ed; }
+        .badge-green { background: rgba(var(--color-success-rgb), 0.2); color: var(--color-success); }
+        .badge-red { background: rgba(var(--color-danger-rgb), 0.2); color: var(--color-danger); }
+        .badge-yellow { background: rgba(var(--color-warning-rgb), 0.2); color: var(--color-warning); }
+        .badge-blue { background: rgba(var(--color-info-rgb), 0.2); color: var(--color-info); }
         .section-group { margin-bottom: 1.5rem; }
         .section-header {
             font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem;
-            padding: 0.5rem 0.75rem; background: rgba(79,209,197,0.1);
-            border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem 0.75rem; background: rgba(var(--color-accent-rgb), 0.1);
+            border-radius: var(--radius-sm); display: flex; align-items: center; gap: 0.5rem;
         }
         .filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
         .filter-btn {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
-            color: #e4e4e7; padding: 0.4rem 0.8rem; border-radius: 8px;
+            background: var(--color-surface-hover); border: 1px solid var(--color-border-light);
+            color: var(--color-text-primary); padding: 0.4rem 0.8rem; border-radius: var(--radius-sm);
             cursor: pointer; font-size: 0.85rem; font-family: inherit; transition: all 0.2s;
         }
-        .filter-btn:hover { border-color: rgba(79,209,197,0.4); }
-        .filter-btn.active { border-color: #4fd1c5; background: rgba(79,209,197,0.15); color: #4fd1c5; }
+        .filter-btn:hover { border-color: rgba(var(--color-accent-rgb), 0.4); }
+        .filter-btn.active { border-color: var(--color-accent); background: rgba(var(--color-accent-rgb), 0.15); color: var(--color-accent); }
+        /* Utility classes */
+        .hint-box { background: rgba(var(--color-accent-rgb), 0.1); padding: 0.75rem; border-radius: var(--radius-sm); margin-bottom: 1rem; font-size: 0.8rem; }
+        .preview-box { margin-top: 1rem; padding: 0.75rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-sm); font-size: 0.8rem; }
+        .mt-1 { margin-top: 1rem; }
+        .ml-half { margin-left: 0.5rem; }
+        .text-accent { color: var(--color-accent); }
+        .text-muted { color: var(--color-text-muted); }
+        .text-small { font-size: 0.8rem; }
+        .text-bold { font-weight: 600; }
+        .input-narrow { max-width: 150px; }
+        .empty-state { text-align: center; color: var(--color-text-muted); padding: 2rem; }
+        /* Toast notification */
+        .toast {
+            position: fixed; top: 1.5rem; right: 1.5rem; z-index: 1000;
+            max-width: 400px; animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @media (max-width: 600px) {
             .stats-grid { grid-template-columns: 1fr; }
             .stats-grid-4 { grid-template-columns: repeat(2, 1fr); }
@@ -203,12 +251,12 @@
 
         <!-- Mode Selector -->
         <div class="mode-selector">
-            <button class="mode-btn active" id="modeMapBtn" onclick="switchMode('map')">
+            <button class="mode-btn active" id="modeMapBtn">
                 <div class="mode-icon">📊</div>
                 <div class="mode-title">Map คะแนน</div>
                 <div class="mode-desc">นำเข้าคะแนนจากไฟล์ภายนอกเข้า Canvas</div>
             </button>
-            <button class="mode-btn" id="modeCheckBtn" onclick="switchMode('check')">
+            <button class="mode-btn" id="modeCheckBtn">
                 <div class="mode-icon">🔍</div>
                 <div class="mode-title">ตรวจสอบสถานะนักศึกษา</div>
                 <div class="mode-desc">เทียบรายชื่อ Canvas กับสำนักทะเบียน</div>
@@ -218,51 +266,51 @@
         <!-- Score Mapping Mode Steps -->
         <div id="mapMode">
         <div class="step-nav">
-            <div class="step-dot active" id="dot1">1</div>
-            <div class="step-dot" id="dot2">2</div>
-            <div class="step-dot" id="dot3">3</div>
-            <div class="step-dot" id="dot4">4</div>
+            <div class="step-dot active" id="mapDot1">1</div>
+            <div class="step-dot" id="mapDot2">2</div>
+            <div class="step-dot" id="mapDot3">3</div>
+            <div class="step-dot" id="mapDot4">4</div>
         </div>
 
         <!-- Step 1 -->
-        <div class="card" id="step1">
+        <div class="card" id="mapStep1">
             <h2>1️⃣ อัพโหลดไฟล์ Grade จาก Canvas</h2>
             <p class="hint">ดาวน์โหลดไฟล์ Grades จาก Canvas (Gradebook > Export) ในรูปแบบ CSV หรือ Excel</p>
-            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+            <div class="hint hint-box">
                 📌 ไฟล์ Canvas จะมี columns: Student, ID, SIS User ID, SIS Login ID, Integration ID, Section, แล้วตามด้วย Assignments
             </div>
             <label class="upload-zone" id="canvasZone">
-                <input type="file" id="canvasFile" accept=".csv,.xlsx,.xls">
+                <input type="file" id="canvasFile" accept=".csv,.xlsx,.xls" aria-label="อัพโหลดไฟล์ Canvas Grade">
                 <div class="icon">📁</div>
                 <div id="canvasName">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
                 <div class="info" id="canvasInfo">รองรับ .csv, .xlsx</div>
             </label>
-            <div id="canvasPreview" class="hidden" style="margin-top:1rem; padding:0.75rem; background:rgba(255,255,255,0.03); border-radius:8px; font-size:0.8rem;"></div>
-            <div id="canvasError" class="error-msg hidden"></div>
-            <div style="margin-top:1rem;">
+            <div id="canvasPreview" class="hidden preview-box"></div>
+            <div id="canvasError" class="error-msg hidden" role="alert"></div>
+            <div class="mt-1">
                 <button class="btn" id="btnNext1" disabled>ถัดไป →</button>
             </div>
         </div>
 
         <!-- Step 2 -->
-        <div class="card hidden" id="step2">
+        <div class="card hidden" id="mapStep2">
             <h2>2️⃣ อัพโหลดไฟล์คะแนน</h2>
             <p class="hint">ไฟล์ต้องมี ID หรือ Email (หรือทั้งสอง) - หากมีทั้งสองจะใช้ Email เป็นหลัก</p>
-            <div id="errorBox" class="error-msg hidden"></div>
+            <div id="errorBox" class="error-msg hidden" role="alert"></div>
             <label class="upload-zone" id="scoreZone">
-                <input type="file" id="scoreFile" accept=".csv,.xlsx,.xls">
+                <input type="file" id="scoreFile" accept=".csv,.xlsx,.xls" aria-label="อัพโหลดไฟล์คะแนน">
                 <div class="icon">📊</div>
                 <div id="scoreName">คลิกเพื่อเลือกไฟล์คะแนน</div>
                 <div class="info" id="scoreInfo">รองรับ .csv, .xlsx</div>
             </label>
-            <div style="margin-top:1rem;">
+            <div class="mt-1">
                 <button class="btn btn-secondary" id="btnBack2">← ย้อนกลับ</button>
-                <button class="btn" id="btnNext2" disabled style="margin-left:0.5rem;">ถัดไป →</button>
+                <button class="btn ml-half" id="btnNext2" disabled>ถัดไป →</button>
             </div>
         </div>
 
         <!-- Step 3 -->
-        <div class="card hidden" id="step3">
+        <div class="card hidden" id="mapStep3">
             <h2>3️⃣ ตั้งค่าการ Map คะแนน</h2>
             <div class="form-group">
                 <label class="field">เลือก Assignment ที่จะส่งคะแนนเข้า:</label>
@@ -287,21 +335,25 @@
             </div>
             <div class="form-group hidden" id="attendScoreGroup">
                 <label class="field">คะแนนที่จะให้ (ถ้ามีชื่อในรายการ):</label>
-                <input type="number" id="attendScore" value="1" min="0" step="0.1" style="max-width:150px;">
+                <input type="number" id="attendScore" value="1" min="0" step="0.1" class="input-narrow">
             </div>
             <div>
                 <button class="btn btn-secondary" id="btnBack3">← ย้อนกลับ</button>
-                <button class="btn" id="btnMap" style="margin-left:0.5rem;">🔄 ดำเนินการ Map คะแนน</button>
+                <button class="btn ml-half" id="btnMap">🔄 ดำเนินการ Map คะแนน</button>
             </div>
         </div>
 
         <!-- Step 4 -->
-        <div class="card hidden" id="step4">
+        <div class="card hidden" id="mapStep4">
             <h2>4️⃣ ผลการ Map คะแนน</h2>
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">นักศึกษาทั้งหมด</div></div>
                 <div class="stat-card"><div class="stat-value green" id="statMatched">0</div><div class="stat-label">จับคู่สำเร็จ</div></div>
                 <div class="stat-card"><div class="stat-value red" id="statNotFound">0</div><div class="stat-label">ไม่พบในไฟล์คะแนน</div></div>
+            </div>
+            <div class="actions">
+                <button class="btn" id="btnExport">📥 ดาวน์โหลด CSV สำหรับ Import Canvas</button>
+                <button class="btn btn-secondary" id="btnReset">🔄 เริ่มใหม่</button>
             </div>
             <div class="table-wrap">
                 <table>
@@ -317,10 +369,6 @@
                     </thead>
                     <tbody id="resultBody"></tbody>
                 </table>
-            </div>
-            <div class="actions">
-                <button class="btn" id="btnExport">📥 ดาวน์โหลด CSV สำหรับ Import Canvas</button>
-                <button class="btn btn-secondary" id="btnReset">🔄 เริ่มใหม่</button>
             </div>
         </div>
 
@@ -338,18 +386,18 @@
         <div class="card" id="chkStep1">
             <h2>1️⃣ อัพโหลดไฟล์ Grade จาก Canvas</h2>
             <p class="hint">ดาวน์โหลดไฟล์ Grades จาก Canvas (Gradebook > Export) - ไม่จำเป็นต้องมี Assignment</p>
-            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+            <div class="hint hint-box">
                 📌 ไฟล์ Canvas จะมี columns: Student, ID, SIS User ID, SIS Login ID, Integration ID, Section
             </div>
             <label class="upload-zone" id="chkCanvasZone">
-                <input type="file" id="chkCanvasFile" accept=".csv,.xlsx,.xls">
+                <input type="file" id="chkCanvasFile" accept=".csv,.xlsx,.xls" aria-label="อัพโหลดไฟล์ Canvas Grade สำหรับตรวจสอบ">
                 <div class="icon">📁</div>
                 <div id="chkCanvasName">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง</div>
                 <div class="info" id="chkCanvasInfo">รองรับ .csv, .xlsx</div>
             </label>
-            <div id="chkCanvasPreview" class="hidden" style="margin-top:1rem; padding:0.75rem; background:rgba(255,255,255,0.03); border-radius:8px; font-size:0.8rem;"></div>
-            <div id="chkCanvasError" class="error-msg hidden"></div>
-            <div style="margin-top:1rem;">
+            <div id="chkCanvasPreview" class="hidden preview-box"></div>
+            <div id="chkCanvasError" class="error-msg hidden" role="alert"></div>
+            <div class="mt-1">
                 <button class="btn" id="chkBtnNext1" disabled>ถัดไป →</button>
             </div>
         </div>
@@ -358,20 +406,20 @@
         <div class="card hidden" id="chkStep2">
             <h2>2️⃣ อัพโหลดไฟล์รายชื่อจากสำนักทะเบียน</h2>
             <p class="hint">ไฟล์ CSV แยกตาม section - ชื่อไฟล์: รหัสวิชา(6 ตัว) + lecture section(3 ตัว) + lab section(3 ตัว) เช่น 261111802000.csv</p>
-            <div class="hint" style="background:rgba(79,209,197,0.1); padding:0.75rem; border-radius:8px; margin-bottom:1rem; font-size:0.8rem;">
+            <div class="hint hint-box">
                 📌 แต่ละไฟล์ประกอบด้วย: ID, NAME, SNAME, Column1_1, FACID, FACNAME
             </div>
             <label class="upload-zone" id="regZone">
-                <input type="file" id="regFiles" accept=".csv,.xlsx,.xls" multiple>
+                <input type="file" id="regFiles" accept=".csv,.xlsx,.xls" multiple aria-label="อัพโหลดไฟล์รายชื่อจากสำนักทะเบียน">
                 <div class="icon">📋</div>
                 <div id="regName">คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)</div>
                 <div class="info" id="regInfo">รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน</div>
             </label>
             <div id="regFileList" class="file-list"></div>
-            <div id="regError" class="error-msg hidden"></div>
-            <div style="margin-top:1rem;">
+            <div id="regError" class="error-msg hidden" role="alert"></div>
+            <div class="mt-1">
                 <button class="btn btn-secondary" id="chkBtnBack2">← ย้อนกลับ</button>
-                <button class="btn" id="chkBtnCompare" disabled style="margin-left:0.5rem;">🔍 ตรวจสอบสถานะ</button>
+                <button class="btn ml-half" id="chkBtnCompare" disabled>🔍 ตรวจสอบสถานะ</button>
             </div>
         </div>
 
@@ -384,17 +432,17 @@
                 <div class="stat-card"><div class="stat-value green" id="chkStatMatch">0</div><div class="stat-label">ตรงกัน (ปกติ)</div></div>
                 <div class="stat-card"><div class="stat-value red" id="chkStatIssue">0</div><div class="stat-label">มีปัญหา</div></div>
             </div>
-            <div class="filter-bar">
-                <button class="filter-btn active" data-filter="all" onclick="filterCheckResults('all')">ทั้งหมด</button>
-                <button class="filter-btn" data-filter="match" onclick="filterCheckResults('match')">✅ ตรงกัน</button>
-                <button class="filter-btn" data-filter="canvas-only" onclick="filterCheckResults('canvas-only')">⚠️ มีใน Canvas แต่ไม่มีในทะเบียน</button>
-                <button class="filter-btn" data-filter="reg-only" onclick="filterCheckResults('reg-only')">❌ มีในทะเบียน แต่ไม่มีใน Canvas</button>
-            </div>
-            <div id="chkResultsContainer"></div>
             <div class="actions">
                 <button class="btn" id="chkBtnExport">📥 ดาวน์โหลดรายงานสถานะ CSV</button>
                 <button class="btn btn-secondary" id="chkBtnReset">🔄 เริ่มใหม่</button>
             </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">ทั้งหมด</button>
+                <button class="filter-btn" data-filter="match">✅ ตรงกัน</button>
+                <button class="filter-btn" data-filter="canvas-only">⚠️ มีใน Canvas แต่ไม่มีในทะเบียน</button>
+                <button class="filter-btn" data-filter="reg-only">❌ มีในทะเบียน แต่ไม่มีใน Canvas</button>
+            </div>
+            <div id="chkResultsContainer"></div>
         </div>
         </div><!-- end checkMode -->
 
@@ -404,20 +452,76 @@
     </div>
 
     <script>
-        // State
-        let canvasData = null;
-        let scoreData = null;
-        let assignments = [];
-        let mappingResult = null;
-        let currentStep = 1;
-        let mappingMode = 'score';
+        // ========== CONSTANTS ==========
+        const CANVAS_FIXED_COLS = 6;
+        const ASSIGNMENT_ID_REGEX = /\(\d+\)/;
+        const REGISTRAR_FILENAME_REGEX = /(\d{6})(\d{3})(\d{3})$/;
+        const EXCLUDE_PATTERNS = [
+            'current point', 'final point', 'current score', 'final score',
+            'unposted', 'read only', 'imported assignment'
+        ];
+        const POINTS_ROW_MARKER = 'point';
 
-        // Elements
-        const canvasFileEl = document.getElementById('canvasFile');
-        const scoreFileEl = document.getElementById('scoreFile');
-        const canvasZone = document.getElementById('canvasZone');
-        const scoreZone = document.getElementById('scoreZone');
-        const errorBox = document.getElementById('errorBox');
+        const STATUS = Object.freeze({
+            MATCH: 'match',
+            MATCHED: 'matched',
+            NOT_FOUND: 'not_found',
+            CANVAS_ONLY: 'canvas-only',
+            REG_ONLY: 'reg-only'
+        });
+
+        const STATUS_LABELS = Object.freeze({
+            [STATUS.MATCH]: '✅ ปกติ',
+            [STATUS.MATCHED]: '✅ จับคู่สำเร็จ',
+            [STATUS.NOT_FOUND]: '❌ ไม่พบ',
+            [STATUS.CANVAS_ONLY]: '⚠️ มีใน Canvas แต่ไม่มีในทะเบียน',
+            [STATUS.REG_ONLY]: '❌ มีในทะเบียน แต่ไม่มีใน Canvas'
+        });
+
+        const STATUS_CSS = Object.freeze({
+            [STATUS.MATCH]: 'matched',
+            [STATUS.MATCHED]: 'matched',
+            [STATUS.NOT_FOUND]: 'not-found',
+            [STATUS.CANVAS_ONLY]: 'not-found',
+            [STATUS.REG_ONLY]: 'not-found'
+        });
+
+        // ========== STATE ==========
+        const state = {
+            activeMode: 'map',
+            map: {
+                canvasData: null,
+                scoreData: null,
+                assignments: [],
+                mappingResult: null,
+                currentStep: 1,
+                mappingMode: 'score'
+            },
+            check: {
+                canvasData: null,
+                registrarFiles: [],
+                currentStep: 1,
+                results: null,
+                currentFilter: 'all'
+            }
+        };
+
+        const MODE_REGISTRY = {
+            map: {
+                containerId: 'mapMode',
+                btnId: 'modeMapBtn',
+                totalSteps: 4,
+                dotPrefix: 'map'
+            },
+            check: {
+                containerId: 'checkMode',
+                btnId: 'modeCheckBtn',
+                totalSteps: 3,
+                dotPrefix: 'chk'
+            }
+        };
+
+        // ========== UTILITIES ==========
 
         // Parse file (CSV or Excel)
         function parseFile(file) {
@@ -457,11 +561,34 @@
             });
         }
 
-        // Update step indicators
-        function updateSteps() {
-            for (let i = 1; i <= 4; i++) {
-                const dot = document.getElementById('dot' + i);
-                const card = document.getElementById('step' + i);
+        function validateCanvasFile(data) {
+            const headers = data.headers.map(h => (h || '').toLowerCase());
+            return headers[0] === 'student' && (headers[1] === 'id' || headers[2]?.includes('sis'));
+        }
+
+        function getPointsRowStart(rows) {
+            return rows[0]?.[0]?.toLowerCase().includes(POINTS_ROW_MARKER) ? 1 : 0;
+        }
+
+        function escapeCSV(val) {
+            const v = String(val || '');
+            return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
+        }
+
+        function downloadCSV(csvContent, filenamePrefix) {
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filenamePrefix}_${new Date().toISOString().slice(0, 10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function updateStepIndicators(prefix, totalSteps, currentStep) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const dot = document.getElementById(prefix + 'Dot' + i);
+                const card = document.getElementById(prefix + 'Step' + i);
                 dot.classList.remove('active', 'done');
                 card.classList.add('hidden');
                 if (i < currentStep) dot.classList.add('done');
@@ -469,372 +596,692 @@
             }
         }
 
-        // Canvas file upload
-        canvasFileEl.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const previewEl = document.getElementById('canvasPreview');
-            const errorEl = document.getElementById('canvasError');
-            previewEl.classList.add('hidden');
-            errorEl.classList.add('hidden');
-            
-            try {
-                canvasData = await parseFile(file);
-                
-                // ตรวจสอบว่าเป็นไฟล์ Canvas จริงหรือไม่
-                const headers = canvasData.headers.map(h => (h || '').toLowerCase());
-                const isCanvasFile = headers[0] === 'student' && 
-                                    (headers[1] === 'id' || headers[2]?.includes('sis'));
-                
-                if (!isCanvasFile) {
-                    errorEl.innerHTML = '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>';
-                    errorEl.classList.remove('hidden');
-                    canvasZone.classList.remove('has-file');
-                    document.getElementById('btnNext1').disabled = true;
-                    return;
-                }
-                
-                // Extract assignments from column G (index 6) onwards
-                // Canvas assignments มีรหัสตัวเลขในวงเล็บท้ายชื่อ เช่น "Assignment Name (123456)"
-                // กรอง column สรุปของ Canvas ออก (Points, Score, read only, Current, Final, Unposted)
-                assignments = [];
-                const excludePatterns = ['current point', 'final point', 'current score', 'final score', 
-                                        'unposted', 'read only', 'imported assignment'];
-                canvasData.headers.forEach((h, i) => {
-                    if (i >= 6 && h) {
-                        const lower = h.toLowerCase();
-                        // ตรวจสอบว่าไม่ใช่ column สรุป
-                        const isExcluded = excludePatterns.some(p => lower.includes(p));
-                        // Assignment จะมีรหัสในวงเล็บ เช่น (123456) หรือไม่มี pattern ที่ต้องกรอง
-                        const hasAssignmentId = /\(\d+\)/.test(h);
-                        if (!isExcluded && (hasAssignmentId || !lower.includes('point') && !lower.includes('score'))) {
-                            assignments.push({ index: i, name: h });
-                        }
-                    }
-                });
-                
-                // แสดง preview
-                previewEl.innerHTML = `
-                    <div style="color:#4fd1c5; margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
-                    <div>📋 Columns: ${canvasData.headers.slice(0, 6).join(', ')}</div>
-                    <div style="margin-top:0.5rem;">📝 Assignments ที่พบ (${assignments.length}):</div>
-                    <ul style="margin:0.25rem 0 0 1.25rem; color:#a0aec0;">
-                        ${assignments.slice(0, 5).map(a => `<li>${a.name}</li>`).join('')}
-                        ${assignments.length > 5 ? `<li>... และอีก ${assignments.length - 5} รายการ</li>` : ''}
-                    </ul>
-                `;
-                previewEl.classList.remove('hidden');
-                
-                canvasZone.classList.add('has-file');
-                document.getElementById('canvasName').innerHTML = `<span class="filename">${file.name}</span>`;
-                document.getElementById('canvasInfo').textContent = `พบ ${assignments.length} assignments`;
-                document.getElementById('btnNext1').disabled = assignments.length === 0;
-                
-                if (assignments.length === 0) {
-                    errorEl.textContent = '⚠️ ไม่พบ Assignment ในไฟล์ (อาจเป็นไฟล์ว่างหรือรูปแบบไม่ถูกต้อง)';
-                    errorEl.classList.remove('hidden');
-                }
-            } catch (err) {
-                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
-            }
-        });
-
-        // Score file upload
-        scoreFileEl.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            errorBox.classList.add('hidden');
-            try {
-                scoreData = await parseFile(file);
-                const headers = scoreData.headers.map(h => h.toLowerCase());
-                const hasId = headers.some(h => h === 'id' || h === 'student id' || h === 'sis user id');
-                const hasEmail = headers.some(h => h.includes('email') || h === 'sis login id');
-                if (!hasId && !hasEmail) {
-                    errorBox.textContent = '⚠️ ไฟล์คะแนนต้องมี ID หรือ Email อย่างน้อย 1 ฟิลด์';
-                    errorBox.classList.remove('hidden');
-                    scoreData = null;
-                    return;
-                }
-                scoreZone.classList.add('has-file');
-                document.getElementById('scoreName').innerHTML = `<span class="filename">${file.name}</span>`;
-                document.getElementById('scoreInfo').textContent = `พบ ${scoreData.rows.length} รายการ`;
-                document.getElementById('btnNext2').disabled = false;
-
-                // Populate score column select
-                const sel = document.getElementById('scoreColSelect');
-                sel.innerHTML = '<option value="">-- เลือก column --</option>';
-                scoreData.headers.forEach((h, i) => {
-                    if (h) sel.innerHTML += `<option value="${i}">${h}</option>`;
-                });
-                // Auto-select if has score/คะแนน
-                const autoIdx = headers.findIndex(h => h.includes('score') || h.includes('คะแนน') || h.includes('point'));
-                if (autoIdx >= 0) sel.value = autoIdx;
-            } catch (err) {
-                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
-            }
-        });
-
-        // Navigation
-        document.getElementById('btnNext1').onclick = () => { currentStep = 2; updateSteps(); };
-        document.getElementById('btnBack2').onclick = () => { currentStep = 1; updateSteps(); };
-        document.getElementById('btnNext2').onclick = () => {
-            currentStep = 3;
-            updateSteps();
-            // Populate assignment select
-            const sel = document.getElementById('assignmentSelect');
-            sel.innerHTML = assignments.map(a => `<option value="${a.index}">${a.name}</option>`).join('');
-        };
-        document.getElementById('btnBack3').onclick = () => { currentStep = 2; updateSteps(); };
-
-        // Mode selection
-        document.getElementById('modeScore').onclick = function() {
-            mappingMode = 'score';
-            this.classList.add('selected');
-            document.getElementById('modeAttend').classList.remove('selected');
-            document.getElementById('scoreColGroup').classList.remove('hidden');
-            document.getElementById('attendScoreGroup').classList.add('hidden');
-        };
-        document.getElementById('modeAttend').onclick = function() {
-            mappingMode = 'attendance';
-            this.classList.add('selected');
-            document.getElementById('modeScore').classList.remove('selected');
-            document.getElementById('scoreColGroup').classList.add('hidden');
-            document.getElementById('attendScoreGroup').classList.remove('hidden');
-        };
-
-        // Perform mapping
-        document.getElementById('btnMap').onclick = () => {
-            const assignmentIdx = parseInt(document.getElementById('assignmentSelect').value);
-            const scoreColIdx = parseInt(document.getElementById('scoreColSelect').value);
-            const attendScore = parseFloat(document.getElementById('attendScore').value) || 0;
-
-            if (mappingMode === 'score' && isNaN(scoreColIdx)) {
-                alert('กรุณาเลือก Column คะแนน');
-                return;
-            }
-
-            const canvasHeaders = canvasData.headers.map(h => h.toLowerCase());
-            const scoreHeaders = scoreData.headers.map(h => h.toLowerCase());
-
-            // Find columns
-            const cIdIdx = canvasHeaders.findIndex(h => h === 'id');
-            const cSisIdx = canvasHeaders.findIndex(h => h === 'sis user id' || h === 'sis login id');
-            const cEmailIdx = canvasHeaders.findIndex(h => h.includes('email') || h === 'sis login id');
-
-            const sIdIdx = scoreHeaders.findIndex(h => h === 'id' || h === 'student id' || h === 'sis user id');
-            const sEmailIdx = scoreHeaders.findIndex(h => h.includes('email') || h === 'sis login id');
-
-            const results = [];
-            const startRow = canvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
-
-            canvasData.rows.slice(startRow).forEach((cRow, ri) => {
-                const name = cRow[0] || '';
-                const cId = cRow[cIdIdx] || '';
-                const cSis = cRow[cSisIdx] || '';
-                const cEmail = cRow[cEmailIdx] || '';
-
-                let newScore = null, matchedBy = '';
-
-                for (const sRow of scoreData.rows) {
-                    const sId = sRow[sIdIdx] || '';
-                    const sEmail = sRow[sEmailIdx] || '';
-
-                    // Priority: Email > ID
-                    if (sEmail && cEmail && sEmail.toLowerCase() === cEmail.toLowerCase()) {
-                        matchedBy = 'email';
-                        newScore = mappingMode === 'score' ? sRow[scoreColIdx] : attendScore;
-                        break;
-                    } else if (sId && (cId === sId || cSis === sId)) {
-                        matchedBy = 'id';
-                        newScore = mappingMode === 'score' ? sRow[scoreColIdx] : attendScore;
-                        break;
-                    }
-                }
-
-                results.push({
-                    rowIndex: ri + startRow,
-                    name, id: cId || cSis, email: cEmail,
-                    oldScore: cRow[assignmentIdx] || '',
-                    newScore, matchedBy,
-                    status: newScore !== null ? 'matched' : 'not_found'
-                });
-            });
-
-            mappingResult = { assignmentIdx, results };
-
-            // Update UI
-            document.getElementById('statTotal').textContent = results.length;
-            document.getElementById('statMatched').textContent = results.filter(r => r.status === 'matched').length;
-            document.getElementById('statNotFound').textContent = results.filter(r => r.status === 'not_found').length;
-
-            const tbody = document.getElementById('resultBody');
-            tbody.innerHTML = results.map(r => `
-                <tr>
-                    <td>${r.name}</td>
-                    <td>${r.id}</td>
-                    <td style="font-size:0.8rem">${r.email}</td>
-                    <td>${r.oldScore || '-'}</td>
-                    <td style="font-weight:600">${r.newScore !== null ? r.newScore : '-'}</td>
-                    <td class="${r.status === 'matched' ? 'matched' : 'not-found'}">
-                        ${r.status === 'matched' ? '✅ จับคู่สำเร็จ' : '❌ ไม่พบ'}
-                    </td>
-                </tr>
-            `).join('');
-
-            currentStep = 4;
-            updateSteps();
-        };
-
-        // Export CSV - เฉพาะ column A-F และ Assignment ที่เลือก
-        document.getElementById('btnExport').onclick = () => {
-            if (!mappingResult) return;
-            
-            const assignmentIdx = mappingResult.assignmentIdx;
-            const assignmentName = canvasData.headers[assignmentIdx];
-            
-            // สร้าง headers: A-F (index 0-5) + Assignment ที่เลือก
-            const exportHeaders = [
-                ...canvasData.headers.slice(0, 6),
-                assignmentName
-            ];
-            
-            // สร้าง rows
-            const exportRows = [];
-            const startRow = canvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 0 : -1;
-            
-            canvasData.rows.forEach((row, ri) => {
-                const newRow = [
-                    ...row.slice(0, 6),
-                    ''
-                ];
-                
-                // หา result ที่ตรงกับ row นี้
-                const result = mappingResult.results.find(r => r.rowIndex === ri);
-                if (result && result.newScore !== null) {
-                    newRow[6] = result.newScore;
-                } else {
-                    newRow[6] = row[assignmentIdx] || '';
-                }
-                
-                exportRows.push(newRow);
-            });
-
-            // สร้าง CSV
-            const escapeCSV = (val) => {
-                const v = String(val || '');
-                return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
-            };
-            
-            let csv = exportHeaders.map(escapeCSV).join(',') + '\n';
-            exportRows.forEach(row => {
-                csv += row.map(escapeCSV).join(',') + '\n';
-            });
-
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `canvas_grades_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-
-        // Reset
-        document.getElementById('btnReset').onclick = () => {
-            canvasData = scoreData = mappingResult = null;
-            assignments = [];
-            currentStep = 1;
-            canvasZone.classList.remove('has-file');
-            scoreZone.classList.remove('has-file');
-            document.getElementById('canvasName').textContent = 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง';
-            document.getElementById('canvasInfo').textContent = 'รองรับ .csv, .xlsx';
-            document.getElementById('scoreName').textContent = 'คลิกเพื่อเลือกไฟล์คะแนน';
-            document.getElementById('scoreInfo').textContent = 'รองรับ .csv, .xlsx';
-            document.getElementById('btnNext1').disabled = true;
-            document.getElementById('btnNext2').disabled = true;
-            canvasFileEl.value = '';
-            scoreFileEl.value = '';
-            updateSteps();
-        };
-
-        // ==========================================
-        // Student Status Check Mode
-        // ==========================================
-        let appMode = 'map'; // 'map' or 'check'
-        let chkCanvasData = null;
-        let registrarFiles = []; // { filename, courseCode, lecSection, labSection, data: {headers, rows} }
-        let chkCurrentStep = 1;
-        let chkResults = null; // { sections: [...], allEntries: [...] }
-        let chkCurrentFilter = 'all';
-
-        function switchMode(mode) {
-            appMode = mode;
-            document.getElementById('modeMapBtn').classList.toggle('active', mode === 'map');
-            document.getElementById('modeCheckBtn').classList.toggle('active', mode === 'check');
-            document.getElementById('mapMode').classList.toggle('hidden', mode !== 'map');
-            document.getElementById('checkMode').classList.toggle('hidden', mode !== 'check');
-            if (mode === 'check') updateChkSteps();
+        function resetUploadZone(zoneId, nameId, nameText, infoId, infoText, fileInputId) {
+            document.getElementById(zoneId).classList.remove('has-file');
+            document.getElementById(nameId).textContent = nameText;
+            document.getElementById(infoId).textContent = infoText;
+            document.getElementById(fileInputId).value = '';
         }
 
-        function updateChkSteps() {
-            for (let i = 1; i <= 3; i++) {
-                const dot = document.getElementById('chkDot' + i);
-                const card = document.getElementById('chkStep' + i);
-                dot.classList.remove('active', 'done');
-                card.classList.add('hidden');
-                if (i < chkCurrentStep) dot.classList.add('done');
-                if (i === chkCurrentStep) { dot.classList.add('active'); card.classList.remove('hidden'); }
+        function findColumnIndex(headers, ...terms) {
+            const lower = headers.map(h => (h || '').toLowerCase());
+            for (const term of terms) {
+                const idx = lower.findIndex(h => typeof term === 'function' ? term(h) : h === term);
+                if (idx >= 0) return idx;
             }
+            return -1;
         }
 
-        // Parse registrar filename: e.g. "261111802000.csv" -> { courseCode: "261111", lecSection: "802", labSection: "000" }
+        function showInlineError(elementId, message) {
+            const el = document.getElementById(elementId);
+            el.innerHTML = message;
+            el.classList.remove('hidden');
+        }
+
+        function hideElement(elementId) {
+            document.getElementById(elementId).classList.add('hidden');
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'error-msg toast';
+            toast.textContent = message;
+            toast.setAttribute('role', 'alert');
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        function extractAssignments(headers) {
+            const assignments = [];
+            headers.forEach((h, i) => {
+                if (i >= CANVAS_FIXED_COLS && h) {
+                    const lower = h.toLowerCase();
+                    const isExcluded = EXCLUDE_PATTERNS.some(p => lower.includes(p));
+                    const hasAssignmentId = ASSIGNMENT_ID_REGEX.test(h);
+                    if (!isExcluded && (hasAssignmentId || !lower.includes('point') && !lower.includes('score'))) {
+                        assignments.push({ index: i, name: h });
+                    }
+                }
+            });
+            return assignments;
+        }
+
         function parseRegFilename(filename) {
-            const base = filename.replace(/\.[^.]+$/, ''); // remove extension
-            const match = base.match(/(\d{6})(\d{3})(\d{3})$/);
+            const base = filename.replace(/\.[^.]+$/, '');
+            const match = base.match(REGISTRAR_FILENAME_REGEX);
             if (match) {
                 return { courseCode: match[1], lecSection: match[2], labSection: match[3] };
             }
             return null;
         }
 
-        // Check Canvas file upload
+        // ========== MODE MANAGEMENT ==========
+
+        function switchMode(mode) {
+            state.activeMode = mode;
+            for (const [key, config] of Object.entries(MODE_REGISTRY)) {
+                document.getElementById(config.btnId).classList.toggle('active', key === mode);
+                document.getElementById(config.containerId).classList.toggle('hidden', key !== mode);
+            }
+            const activeConfig = MODE_REGISTRY[mode];
+            const modeState = state[mode];
+            updateStepIndicators(activeConfig.dotPrefix, activeConfig.totalSteps, modeState.currentStep);
+        }
+
+        function updateMapSteps() {
+            updateStepIndicators('map', MODE_REGISTRY.map.totalSteps, state.map.currentStep);
+        }
+
+        function updateChkSteps() {
+            updateStepIndicators('chk', MODE_REGISTRY.check.totalSteps, state.check.currentStep);
+        }
+
+        // ========== SCORE MAPPING: Data Processing ==========
+
+        function findCanvasColumnIndices(headers) {
+            const lower = headers.map(h => (h || '').toLowerCase());
+            return {
+                idIdx: lower.findIndex(h => h === 'id'),
+                sisIdx: lower.findIndex(h => h === 'sis user id' || h === 'sis login id'),
+                emailIdx: lower.findIndex(h => h.includes('email') || h === 'sis login id')
+            };
+        }
+
+        function findScoreColumnIndices(headers) {
+            const lower = headers.map(h => (h || '').toLowerCase());
+            return {
+                idIdx: lower.findIndex(h => h === 'id' || h === 'student id' || h === 'sis user id'),
+                emailIdx: lower.findIndex(h => h.includes('email') || h === 'sis login id')
+            };
+        }
+
+        function buildScoreLookup(scoreRows, scoreCols) {
+            const emailMap = new Map();
+            const idMap = new Map();
+            scoreRows.forEach(sRow => {
+                const email = (sRow[scoreCols.emailIdx] || '').toLowerCase().trim();
+                const id = (sRow[scoreCols.idIdx] || '').trim();
+                if (email && !emailMap.has(email)) emailMap.set(email, sRow);
+                if (id && !idMap.has(id)) idMap.set(id, sRow);
+            });
+            return { emailMap, idMap };
+        }
+
+        function performStudentMatching(canvasData, scoreData, assignmentIdx, mode, scoreColIdx, attendScore) {
+            const canvasCols = findCanvasColumnIndices(canvasData.headers);
+            const scoreCols = findScoreColumnIndices(scoreData.headers);
+            const { emailMap, idMap } = buildScoreLookup(scoreData.rows, scoreCols);
+
+            const startRow = getPointsRowStart(canvasData.rows);
+
+            return canvasData.rows.slice(startRow).map((cRow, ri) => {
+                const name = cRow[0] || '';
+                const cId = (cRow[canvasCols.idIdx] || '').trim();
+                const cSis = (cRow[canvasCols.sisIdx] || '').trim();
+                const cEmail = (cRow[canvasCols.emailIdx] || '').toLowerCase().trim();
+
+                let newScore = null, matchedBy = '';
+
+                // Priority: Email > ID (O(1) lookup via Map)
+                const emailMatch = cEmail ? emailMap.get(cEmail) : null;
+                if (emailMatch) {
+                    matchedBy = 'email';
+                    newScore = mode === 'score' ? emailMatch[scoreColIdx] : attendScore;
+                } else {
+                    const idMatch = idMap.get(cId) || idMap.get(cSis);
+                    if (idMatch) {
+                        matchedBy = 'id';
+                        newScore = mode === 'score' ? idMatch[scoreColIdx] : attendScore;
+                    }
+                }
+
+                return {
+                    rowIndex: ri + startRow,
+                    name,
+                    id: cId || cSis,
+                    email: cRow[canvasCols.emailIdx] || '',
+                    oldScore: cRow[assignmentIdx] || '',
+                    newScore,
+                    matchedBy,
+                    status: newScore !== null ? STATUS.MATCHED : STATUS.NOT_FOUND
+                };
+            });
+        }
+
+        // ========== SCORE MAPPING: Rendering ==========
+
+        function renderMappingResults(results) {
+            document.getElementById('statTotal').textContent = results.length;
+            document.getElementById('statMatched').textContent = results.filter(r => r.status === STATUS.MATCHED).length;
+            document.getElementById('statNotFound').textContent = results.filter(r => r.status === STATUS.NOT_FOUND).length;
+
+            document.getElementById('resultBody').innerHTML = results.map(r => `
+                <tr>
+                    <td>${r.name}</td>
+                    <td>${r.id}</td>
+                    <td class="text-small">${r.email}</td>
+                    <td>${r.oldScore || '-'}</td>
+                    <td class="text-bold">${r.newScore !== null ? r.newScore : '-'}</td>
+                    <td class="${STATUS_CSS[r.status]}">${STATUS_LABELS[r.status]}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========== SCORE MAPPING: Export ==========
+
+        function exportMappingCSV() {
+            const { mappingResult, canvasData } = state.map;
+            if (!mappingResult) return;
+
+            const assignmentIdx = mappingResult.assignmentIdx;
+            const assignmentName = canvasData.headers[assignmentIdx];
+
+            const exportHeaders = [...canvasData.headers.slice(0, CANVAS_FIXED_COLS), assignmentName];
+
+            // Build O(1) lookup for results by row index
+            const resultByRow = new Map(mappingResult.results.map(r => [r.rowIndex, r]));
+
+            const exportRows = canvasData.rows.map((row, ri) => {
+                const newRow = [...row.slice(0, CANVAS_FIXED_COLS), ''];
+                const result = resultByRow.get(ri);
+                newRow[CANVAS_FIXED_COLS] = (result && result.newScore !== null) ? result.newScore : (row[assignmentIdx] || '');
+                return newRow;
+            });
+
+            let csv = exportHeaders.map(escapeCSV).join(',') + '\n';
+            exportRows.forEach(row => {
+                csv += row.map(escapeCSV).join(',') + '\n';
+            });
+
+            downloadCSV(csv, 'canvas_grades');
+        }
+
+        // ========== SCORE MAPPING: Reset ==========
+
+        function resetMapMode() {
+            Object.assign(state.map, {
+                canvasData: null, scoreData: null, assignments: [],
+                mappingResult: null, currentStep: 1, mappingMode: 'score'
+            });
+            resetUploadZone('canvasZone', 'canvasName', 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง', 'canvasInfo', 'รองรับ .csv, .xlsx', 'canvasFile');
+            resetUploadZone('scoreZone', 'scoreName', 'คลิกเพื่อเลือกไฟล์คะแนน', 'scoreInfo', 'รองรับ .csv, .xlsx', 'scoreFile');
+            document.getElementById('btnNext1').disabled = true;
+            document.getElementById('btnNext2').disabled = true;
+            hideElement('canvasPreview');
+            hideElement('canvasError');
+            updateMapSteps();
+        }
+
+        // ========== STUDENT STATUS CHECK: Data Processing ==========
+
+        function extractCanvasStudents(canvasData) {
+            const headers = canvasData.headers.map(h => (h || '').toLowerCase());
+            const cSisIdx = headers.findIndex(h => h === 'sis user id');
+            const cIdIdx = headers.findIndex(h => h === 'id');
+            const cSectionIdx = headers.findIndex(h => h === 'section');
+            const startRow = getPointsRowStart(canvasData.rows);
+
+            return canvasData.rows.slice(startRow).map(row => ({
+                name: row[0] || '',
+                canvasId: row[cIdIdx] || '',
+                sisId: (row[cSisIdx] || '').trim(),
+                section: row[cSectionIdx] || '',
+                row
+            })).filter(s => s.name && s.name.toLowerCase() !== 'test student');
+        }
+
+        function compareSection(canvasStudents, canvasBySisId, regFile) {
+            const regHeaders = regFile.data.headers.map(h => (h || '').toLowerCase().trim());
+            const regIdIdx = regHeaders.findIndex(h => h === 'id');
+            const regNameIdx = regHeaders.findIndex(h => h === 'name');
+            const regSnameIdx = regHeaders.findIndex(h => h === 'sname');
+            const regFacIdIdx = regHeaders.findIndex(h => h === 'facid');
+            const regFacNameIdx = regHeaders.findIndex(h => h === 'facname');
+
+            const sectionLabel = `วิชา ${regFile.courseCode} | Lec ${regFile.lecSection} | Lab ${regFile.labSection}`;
+
+            const regStudents = regFile.data.rows.map(row => ({
+                id: (row[regIdIdx] || '').trim(),
+                name: row[regNameIdx] || '',
+                sname: row[regSnameIdx] || '',
+                facId: regFacIdIdx >= 0 ? (row[regFacIdIdx] || '') : '',
+                facName: regFacNameIdx >= 0 ? (row[regFacNameIdx] || '') : ''
+            })).filter(s => s.id);
+
+            const regIdSet = new Set(regStudents.map(s => s.id));
+            // Build registrar lookup Map for O(1) access
+            const regById = new Map(regStudents.map(s => [s.id, s]));
+            const matched = [];
+            const regOnly = [];
+
+            // Check Canvas students against this registrar section
+            canvasStudents.forEach(cs => {
+                if (!cs.sisId) return;
+                if (regIdSet.has(cs.sisId)) {
+                    const regStudent = regById.get(cs.sisId);
+                    matched.push({
+                        id: cs.sisId,
+                        canvasName: cs.name,
+                        regName: regStudent ? `${regStudent.name} ${regStudent.sname}` : '',
+                        canvasSection: cs.section,
+                        facName: regStudent?.facName || '',
+                        status: STATUS.MATCH,
+                        section: sectionLabel
+                    });
+                }
+            });
+
+            // Registrar students not in Canvas (O(1) lookup via Map)
+            regStudents.forEach(rs => {
+                if (!canvasBySisId.has(rs.id)) {
+                    regOnly.push({
+                        id: rs.id,
+                        canvasName: '-',
+                        regName: `${rs.name} ${rs.sname}`,
+                        canvasSection: '-',
+                        facName: rs.facName,
+                        status: STATUS.REG_ONLY,
+                        section: sectionLabel
+                    });
+                }
+            });
+
+            return {
+                label: sectionLabel,
+                filename: regFile.filename,
+                courseCode: regFile.courseCode,
+                lecSection: regFile.lecSection,
+                labSection: regFile.labSection,
+                matched,
+                canvasOnly: [],
+                regOnly,
+                regTotal: regStudents.length
+            };
+        }
+
+        function findCanvasOnlyStudents(canvasStudents, allRegIds) {
+            return canvasStudents
+                .filter(cs => cs.sisId && !allRegIds.has(cs.sisId))
+                .map(cs => ({
+                    id: cs.sisId,
+                    canvasName: cs.name,
+                    regName: '-',
+                    canvasSection: cs.section,
+                    facName: '-',
+                    status: STATUS.CANVAS_ONLY,
+                    section: 'ไม่พบในทะเบียน'
+                }));
+        }
+
+        function buildAllRegIds(registrarFiles) {
+            const allRegIds = new Set();
+            registrarFiles.forEach(rf => {
+                const regHeaders = rf.data.headers.map(h => (h || '').toLowerCase().trim());
+                const regIdIdx = regHeaders.findIndex(h => h === 'id');
+                rf.data.rows.forEach(row => {
+                    const id = (row[regIdIdx] || '').trim();
+                    if (id) allRegIds.add(id);
+                });
+            });
+            return allRegIds;
+        }
+
+        function performStatusCheck(canvasData, registrarFiles) {
+            const canvasStudents = extractCanvasStudents(canvasData);
+
+            // Build Canvas SIS ID Map once for O(1) lookups
+            const canvasBySisId = new Map();
+            canvasStudents.forEach(cs => {
+                if (cs.sisId) canvasBySisId.set(cs.sisId, cs);
+            });
+
+            const allEntries = [];
+            const sectionResults = [];
+
+            registrarFiles.forEach(regFile => {
+                const result = compareSection(canvasStudents, canvasBySisId, regFile);
+                sectionResults.push(result);
+                allEntries.push(...result.matched, ...result.regOnly);
+            });
+
+            const allRegIds = buildAllRegIds(registrarFiles);
+            const canvasOnlyStudents = findCanvasOnlyStudents(canvasStudents, allRegIds);
+            allEntries.push(...canvasOnlyStudents);
+
+            const totalMatched = allEntries.filter(e => e.status === STATUS.MATCH).length;
+            const totalRegOnly = allEntries.filter(e => e.status === STATUS.REG_ONLY).length;
+
+            return {
+                sections: sectionResults,
+                allEntries,
+                canvasOnlyStudents,
+                canvasTotal: canvasStudents.length,
+                regTotal: registrarFiles.reduce((sum, f) => sum + f.data.rows.filter(r => r.some(c => c)).length, 0),
+                totalMatched,
+                totalIssues: canvasOnlyStudents.length + totalRegOnly
+            };
+        }
+
+        // ========== STUDENT STATUS CHECK: Rendering ==========
+
+        function groupEntriesBySection(entries) {
+            const grouped = {};
+            entries.forEach(e => {
+                if (!grouped[e.section]) grouped[e.section] = [];
+                grouped[e.section].push(e);
+            });
+            return grouped;
+        }
+
+        function renderSectionTable(section, items) {
+            const matchCount = items.filter(i => i.status === STATUS.MATCH).length;
+            const canvasOnlyCount = items.filter(i => i.status === STATUS.CANVAS_ONLY).length;
+            const regOnlyCount = items.filter(i => i.status === STATUS.REG_ONLY).length;
+
+            const rows = items.map(item => `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.canvasName}</td>
+                    <td>${item.regName}</td>
+                    <td>${item.canvasSection}</td>
+                    <td>${item.facName}</td>
+                    <td class="${STATUS_CSS[item.status]}">${STATUS_LABELS[item.status]}</td>
+                </tr>
+            `).join('');
+
+            return `<div class="section-group">
+                <div class="section-header">
+                    📋 ${section}
+                    <span class="badge badge-green">${matchCount} ตรงกัน</span>
+                    ${canvasOnlyCount > 0 ? `<span class="badge badge-yellow">${canvasOnlyCount} เฉพาะ Canvas</span>` : ''}
+                    ${regOnlyCount > 0 ? `<span class="badge badge-red">${regOnlyCount} เฉพาะทะเบียน</span>` : ''}
+                </div>
+                <div class="table-wrap"><table>
+                    <thead><tr>
+                        <th>รหัสนักศึกษา</th>
+                        <th>ชื่อ (Canvas)</th>
+                        <th>ชื่อ (ทะเบียน)</th>
+                        <th>Section (Canvas)</th>
+                        <th>คณะ</th>
+                        <th>สถานะ</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table></div>
+            </div>`;
+        }
+
+        function renderCheckResults() {
+            const results = state.check.results;
+            if (!results) return;
+
+            const container = document.getElementById('chkResultsContainer');
+            let entries = results.allEntries;
+
+            if (state.check.currentFilter !== 'all') {
+                entries = entries.filter(e => e.status === state.check.currentFilter);
+            }
+
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="empty-state">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div>';
+                return;
+            }
+
+            const grouped = groupEntriesBySection(entries);
+            container.innerHTML = Object.entries(grouped)
+                .map(([section, items]) => renderSectionTable(section, items))
+                .join('');
+        }
+
+        function filterCheckResults(filter) {
+            state.check.currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            renderCheckResults();
+        }
+
+        function updateRegFileList() {
+            const files = state.check.registrarFiles;
+            const listEl = document.getElementById('regFileList');
+            if (files.length === 0) {
+                listEl.innerHTML = '';
+                return;
+            }
+            listEl.innerHTML = files.map((f, idx) => `
+                <div class="file-item">
+                    <div>
+                        <span class="file-section">วิชา ${f.courseCode} | Lec ${f.lecSection} | Lab ${f.labSection}</span>
+                        <span class="text-muted ml-half">(${f.data.rows.length} คน)</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                        <span class="text-muted text-small">${f.filename}</span>
+                        <span class="file-remove" data-index="${idx}" aria-label="ลบไฟล์ ${f.filename}">✕ ลบ</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ========== STUDENT STATUS CHECK: Export ==========
+
+        function exportCheckCSV() {
+            const results = state.check.results;
+            if (!results) return;
+
+            const STATUS_TEXT = {
+                [STATUS.MATCH]: 'ปกติ',
+                [STATUS.CANVAS_ONLY]: 'มีใน Canvas แต่ไม่มีในทะเบียน',
+                [STATUS.REG_ONLY]: 'มีในทะเบียน แต่ไม่มีใน Canvas'
+            };
+
+            const headers = ['รหัสนักศึกษา', 'ชื่อ (Canvas)', 'ชื่อ (ทะเบียน)', 'Section (Canvas)', 'คณะ', 'Section (ทะเบียน)', 'สถานะ'];
+            let csv = headers.map(escapeCSV).join(',') + '\n';
+
+            results.allEntries.forEach(item => {
+                csv += [item.id, item.canvasName, item.regName, item.canvasSection, item.facName, item.section, STATUS_TEXT[item.status] || '']
+                    .map(escapeCSV).join(',') + '\n';
+            });
+
+            downloadCSV(csv, 'student_status_check');
+        }
+
+        // ========== STUDENT STATUS CHECK: Reset ==========
+
+        function resetCheckMode() {
+            Object.assign(state.check, {
+                canvasData: null, registrarFiles: [],
+                currentStep: 1, results: null, currentFilter: 'all'
+            });
+            resetUploadZone('chkCanvasZone', 'chkCanvasName', 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง', 'chkCanvasInfo', 'รองรับ .csv, .xlsx', 'chkCanvasFile');
+            resetUploadZone('regZone', 'regName', 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)', 'regInfo', 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน', 'regFiles');
+            document.getElementById('regFileList').innerHTML = '';
+            document.getElementById('chkBtnNext1').disabled = true;
+            document.getElementById('chkBtnCompare').disabled = true;
+            hideElement('chkCanvasPreview');
+            hideElement('chkCanvasError');
+            hideElement('regError');
+            updateChkSteps();
+        }
+
+        function removeRegFile(idx) {
+            state.check.registrarFiles.splice(idx, 1);
+            updateRegFileList();
+            document.getElementById('chkBtnCompare').disabled = state.check.registrarFiles.length === 0;
+            if (state.check.registrarFiles.length === 0) {
+                document.getElementById('regZone').classList.remove('has-file');
+                document.getElementById('regName').textContent = 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)';
+                document.getElementById('regInfo').textContent = 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน';
+            }
+        }
+
+        // ========== EVENT BINDING ==========
+
+        // Mode selector
+        document.getElementById('modeMapBtn').addEventListener('click', () => switchMode('map'));
+        document.getElementById('modeCheckBtn').addEventListener('click', () => switchMode('check'));
+
+        // Map mode: Canvas file upload
+        document.getElementById('canvasFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            hideElement('canvasPreview');
+            hideElement('canvasError');
+
+            try {
+                state.map.canvasData = await parseFile(file);
+
+                if (!validateCanvasFile(state.map.canvasData)) {
+                    showInlineError('canvasError', '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>');
+                    document.getElementById('canvasZone').classList.remove('has-file');
+                    document.getElementById('btnNext1').disabled = true;
+                    return;
+                }
+
+                state.map.assignments = extractAssignments(state.map.canvasData.headers);
+
+                const previewEl = document.getElementById('canvasPreview');
+                previewEl.innerHTML = `
+                    <div class="text-accent" style="margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
+                    <div>📋 Columns: ${state.map.canvasData.headers.slice(0, CANVAS_FIXED_COLS).join(', ')}</div>
+                    <div class="mt-1">📝 Assignments ที่พบ (${state.map.assignments.length}):</div>
+                    <ul class="text-muted" style="margin:0.25rem 0 0 1.25rem;">
+                        ${state.map.assignments.slice(0, 5).map(a => `<li>${a.name}</li>`).join('')}
+                        ${state.map.assignments.length > 5 ? `<li>... และอีก ${state.map.assignments.length - 5} รายการ</li>` : ''}
+                    </ul>
+                `;
+                previewEl.classList.remove('hidden');
+
+                document.getElementById('canvasZone').classList.add('has-file');
+                document.getElementById('canvasName').innerHTML = `<span class="filename">${file.name}</span>`;
+                document.getElementById('canvasInfo').textContent = `พบ ${state.map.assignments.length} assignments`;
+                document.getElementById('btnNext1').disabled = state.map.assignments.length === 0;
+
+                if (state.map.assignments.length === 0) {
+                    showInlineError('canvasError', '⚠️ ไม่พบ Assignment ในไฟล์ (อาจเป็นไฟล์ว่างหรือรูปแบบไม่ถูกต้อง)');
+                }
+            } catch (err) {
+                showToast('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+            }
+        });
+
+        // Map mode: Score file upload
+        document.getElementById('scoreFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            hideElement('errorBox');
+            try {
+                state.map.scoreData = await parseFile(file);
+                const headers = state.map.scoreData.headers.map(h => h.toLowerCase());
+                const hasId = headers.some(h => h === 'id' || h === 'student id' || h === 'sis user id');
+                const hasEmail = headers.some(h => h.includes('email') || h === 'sis login id');
+                if (!hasId && !hasEmail) {
+                    showInlineError('errorBox', '⚠️ ไฟล์คะแนนต้องมี ID หรือ Email อย่างน้อย 1 ฟิลด์');
+                    state.map.scoreData = null;
+                    return;
+                }
+                document.getElementById('scoreZone').classList.add('has-file');
+                document.getElementById('scoreName').innerHTML = `<span class="filename">${file.name}</span>`;
+                document.getElementById('scoreInfo').textContent = `พบ ${state.map.scoreData.rows.length} รายการ`;
+                document.getElementById('btnNext2').disabled = false;
+
+                // Populate score column select
+                const sel = document.getElementById('scoreColSelect');
+                sel.innerHTML = '<option value="">-- เลือก column --</option>';
+                state.map.scoreData.headers.forEach((h, i) => {
+                    if (h) sel.innerHTML += `<option value="${i}">${h}</option>`;
+                });
+                const autoIdx = headers.findIndex(h => h.includes('score') || h.includes('คะแนน') || h.includes('point'));
+                if (autoIdx >= 0) sel.value = autoIdx;
+            } catch (err) {
+                showToast('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+            }
+        });
+
+        // Map mode: Navigation
+        document.getElementById('btnNext1').addEventListener('click', () => { state.map.currentStep = 2; updateMapSteps(); });
+        document.getElementById('btnBack2').addEventListener('click', () => { state.map.currentStep = 1; updateMapSteps(); });
+        document.getElementById('btnNext2').addEventListener('click', () => {
+            state.map.currentStep = 3;
+            updateMapSteps();
+            const sel = document.getElementById('assignmentSelect');
+            sel.innerHTML = state.map.assignments.map(a => `<option value="${a.index}">${a.name}</option>`).join('');
+        });
+        document.getElementById('btnBack3').addEventListener('click', () => { state.map.currentStep = 2; updateMapSteps(); });
+
+        // Map mode: Scoring mode selection
+        document.getElementById('modeScore').addEventListener('click', function() {
+            state.map.mappingMode = 'score';
+            this.classList.add('selected');
+            document.getElementById('modeAttend').classList.remove('selected');
+            document.getElementById('scoreColGroup').classList.remove('hidden');
+            document.getElementById('attendScoreGroup').classList.add('hidden');
+        });
+        document.getElementById('modeAttend').addEventListener('click', function() {
+            state.map.mappingMode = 'attendance';
+            this.classList.add('selected');
+            document.getElementById('modeScore').classList.remove('selected');
+            document.getElementById('scoreColGroup').classList.add('hidden');
+            document.getElementById('attendScoreGroup').classList.remove('hidden');
+        });
+
+        // Map mode: Perform mapping
+        document.getElementById('btnMap').addEventListener('click', () => {
+            const assignmentIdx = parseInt(document.getElementById('assignmentSelect').value);
+            const scoreColIdx = parseInt(document.getElementById('scoreColSelect').value);
+            const attendScore = parseFloat(document.getElementById('attendScore').value) || 0;
+
+            if (state.map.mappingMode === 'score' && isNaN(scoreColIdx)) {
+                showToast('กรุณาเลือก Column คะแนน');
+                return;
+            }
+
+            const results = performStudentMatching(
+                state.map.canvasData, state.map.scoreData,
+                assignmentIdx, state.map.mappingMode, scoreColIdx, attendScore
+            );
+
+            state.map.mappingResult = { assignmentIdx, results };
+            renderMappingResults(results);
+
+            state.map.currentStep = 4;
+            updateMapSteps();
+        });
+
+        // Map mode: Export & Reset
+        document.getElementById('btnExport').addEventListener('click', exportMappingCSV);
+        document.getElementById('btnReset').addEventListener('click', resetMapMode);
+
+        // Check mode: Canvas file upload
         document.getElementById('chkCanvasFile').addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            const previewEl = document.getElementById('chkCanvasPreview');
-            const errorEl = document.getElementById('chkCanvasError');
-            previewEl.classList.add('hidden');
-            errorEl.classList.add('hidden');
+            hideElement('chkCanvasPreview');
+            hideElement('chkCanvasError');
 
             try {
-                chkCanvasData = await parseFile(file);
-                const headers = chkCanvasData.headers.map(h => (h || '').toLowerCase());
-                const isCanvasFile = headers[0] === 'student' &&
-                                    (headers[1] === 'id' || headers[2]?.includes('sis'));
+                state.check.canvasData = await parseFile(file);
 
-                if (!isCanvasFile) {
-                    errorEl.innerHTML = '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>';
-                    errorEl.classList.remove('hidden');
+                if (!validateCanvasFile(state.check.canvasData)) {
+                    showInlineError('chkCanvasError', '⚠️ ไฟล์นี้ไม่ใช่ไฟล์ Grade จาก Canvas<br><small>ไฟล์ Canvas ต้องมี columns: Student, ID, SIS User ID, ...</small>');
                     document.getElementById('chkCanvasZone').classList.remove('has-file');
                     document.getElementById('chkBtnNext1').disabled = true;
                     return;
                 }
 
-                // Count students (skip Points row if exists)
-                const startRow = chkCanvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
-                const studentCount = chkCanvasData.rows.length - startRow;
+                const startRow = getPointsRowStart(state.check.canvasData.rows);
+                const studentCount = state.check.canvasData.rows.length - startRow;
 
-                // Find section info from Canvas
+                const headers = state.check.canvasData.headers.map(h => (h || '').toLowerCase());
                 const sectionIdx = headers.findIndex(h => h === 'section');
                 const sections = new Set();
                 if (sectionIdx >= 0) {
-                    chkCanvasData.rows.slice(startRow).forEach(row => {
+                    state.check.canvasData.rows.slice(startRow).forEach(row => {
                         if (row[sectionIdx]) sections.add(row[sectionIdx]);
                     });
                 }
 
+                const previewEl = document.getElementById('chkCanvasPreview');
                 previewEl.innerHTML = `
-                    <div style="color:#4fd1c5; margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
+                    <div class="text-accent" style="margin-bottom:0.5rem;">✅ ตรวจพบโครงสร้าง Canvas:</div>
                     <div>👥 นักศึกษา: ${studentCount} คน</div>
                     ${sections.size > 0 ? `<div>📋 Sections: ${[...sections].join(', ')}</div>` : ''}
                 `;
@@ -845,16 +1292,15 @@
                 document.getElementById('chkCanvasInfo').textContent = `พบ ${studentCount} นักศึกษา`;
                 document.getElementById('chkBtnNext1').disabled = false;
             } catch (err) {
-                alert('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
+                showToast('ไม่สามารถอ่านไฟล์ได้: ' + err.message);
             }
         });
 
-        // Registrar files upload
+        // Check mode: Registrar files upload
         document.getElementById('regFiles').addEventListener('change', async (e) => {
             const files = e.target.files;
             if (!files || files.length === 0) return;
-            const errorEl = document.getElementById('regError');
-            errorEl.classList.add('hidden');
+            hideElement('regError');
 
             const newFiles = [];
             const errors = [];
@@ -868,20 +1314,17 @@
 
                 try {
                     const data = await parseFile(file);
-                    // Validate registrar file has ID column
                     const headers = data.headers.map(h => (h || '').toLowerCase().trim());
-                    const hasId = headers.some(h => h === 'id');
-                    if (!hasId) {
+                    if (!headers.some(h => h === 'id')) {
                         errors.push(`${file.name}: ไม่พบ column ID ในไฟล์`);
                         continue;
                     }
 
-                    // Check for duplicate
                     const key = sectionInfo.courseCode + sectionInfo.lecSection + sectionInfo.labSection;
-                    const existing = registrarFiles.findIndex(f =>
+                    const existing = state.check.registrarFiles.findIndex(f =>
                         f.courseCode + f.lecSection + f.labSection === key);
                     if (existing >= 0) {
-                        registrarFiles.splice(existing, 1); // replace
+                        state.check.registrarFiles.splice(existing, 1);
                     }
 
                     newFiles.push({
@@ -896,340 +1339,67 @@
                 }
             }
 
-            registrarFiles = registrarFiles.concat(newFiles);
+            state.check.registrarFiles = state.check.registrarFiles.concat(newFiles);
 
             if (errors.length > 0) {
-                errorEl.innerHTML = errors.map(err => '⚠️ ' + err).join('<br>');
-                errorEl.classList.remove('hidden');
+                showInlineError('regError', errors.map(err => '⚠️ ' + err).join('<br>'));
             }
 
             updateRegFileList();
-            document.getElementById('chkBtnCompare').disabled = registrarFiles.length === 0;
-            if (registrarFiles.length > 0) {
+            document.getElementById('chkBtnCompare').disabled = state.check.registrarFiles.length === 0;
+            if (state.check.registrarFiles.length > 0) {
                 document.getElementById('regZone').classList.add('has-file');
-                document.getElementById('regName').innerHTML = `<span class="filename">${registrarFiles.length} ไฟล์</span>`;
+                document.getElementById('regName').innerHTML = `<span class="filename">${state.check.registrarFiles.length} ไฟล์</span>`;
                 document.getElementById('regInfo').textContent = `คลิกเพื่อเพิ่มไฟล์`;
             }
         });
 
-        function updateRegFileList() {
-            const listEl = document.getElementById('regFileList');
-            if (registrarFiles.length === 0) {
-                listEl.innerHTML = '';
-                return;
+        // Check mode: Registrar file list - event delegation for remove buttons
+        document.getElementById('regFileList').addEventListener('click', (e) => {
+            const removeBtn = e.target.closest('.file-remove');
+            if (removeBtn) {
+                const idx = parseInt(removeBtn.dataset.index, 10);
+                removeRegFile(idx);
             }
-            listEl.innerHTML = registrarFiles.map((f, idx) => `
-                <div class="file-item">
-                    <div>
-                        <span class="file-section">วิชา ${f.courseCode} | Lec ${f.lecSection} | Lab ${f.labSection}</span>
-                        <span style="color:#a0aec0; margin-left:0.5rem;">(${f.data.rows.length} คน)</span>
-                    </div>
-                    <div style="display:flex; align-items:center; gap:0.75rem;">
-                        <span style="color:#a0aec0; font-size:0.8rem;">${f.filename}</span>
-                        <span class="file-remove" onclick="removeRegFile(${idx})">✕ ลบ</span>
-                    </div>
-                </div>
-            `).join('');
-        }
+        });
 
-        function removeRegFile(idx) {
-            registrarFiles.splice(idx, 1);
-            updateRegFileList();
-            document.getElementById('chkBtnCompare').disabled = registrarFiles.length === 0;
-            if (registrarFiles.length === 0) {
-                document.getElementById('regZone').classList.remove('has-file');
-                document.getElementById('regName').textContent = 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)';
-                document.getElementById('regInfo').textContent = 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน';
-            }
-        }
+        // Check mode: Navigation
+        document.getElementById('chkBtnNext1').addEventListener('click', () => { state.check.currentStep = 2; updateChkSteps(); });
+        document.getElementById('chkBtnBack2').addEventListener('click', () => { state.check.currentStep = 1; updateChkSteps(); });
 
-        // Check navigation
-        document.getElementById('chkBtnNext1').onclick = () => { chkCurrentStep = 2; updateChkSteps(); };
-        document.getElementById('chkBtnBack2').onclick = () => { chkCurrentStep = 1; updateChkSteps(); };
+        // Check mode: Perform comparison
+        document.getElementById('chkBtnCompare').addEventListener('click', () => {
+            if (!state.check.canvasData || state.check.registrarFiles.length === 0) return;
 
-        // Perform comparison
-        document.getElementById('chkBtnCompare').onclick = () => {
-            if (!chkCanvasData || registrarFiles.length === 0) return;
+            state.check.results = performStatusCheck(state.check.canvasData, state.check.registrarFiles);
+            const results = state.check.results;
 
-            const canvasHeaders = chkCanvasData.headers.map(h => (h || '').toLowerCase());
-            const startRow = chkCanvasData.rows[0]?.[0]?.toLowerCase().includes('point') ? 1 : 0;
+            document.getElementById('chkStatCanvas').textContent = results.canvasTotal;
+            document.getElementById('chkStatReg').textContent = results.regTotal;
+            document.getElementById('chkStatMatch').textContent = results.totalMatched;
+            document.getElementById('chkStatIssue').textContent = results.totalIssues;
 
-            // Get Canvas student info
-            const cSisIdx = canvasHeaders.findIndex(h => h === 'sis user id');
-            const cIdIdx = canvasHeaders.findIndex(h => h === 'id');
-            const cSectionIdx = canvasHeaders.findIndex(h => h === 'section');
-
-            const canvasStudents = chkCanvasData.rows.slice(startRow).map(row => ({
-                name: row[0] || '',
-                canvasId: row[cIdIdx] || '',
-                sisId: (row[cSisIdx] || '').trim(),
-                section: row[cSectionIdx] || '',
-                row: row
-            })).filter(s => s.name && s.name.toLowerCase() !== 'test student');
-
-            // Build registrar lookup per section
-            const allEntries = [];
-            const sectionResults = [];
-
-            registrarFiles.forEach(regFile => {
-                const regHeaders = regFile.data.headers.map(h => (h || '').toLowerCase().trim());
-                const regIdIdx = regHeaders.findIndex(h => h === 'id');
-                const regNameIdx = regHeaders.findIndex(h => h === 'name');
-                const regSnameIdx = regHeaders.findIndex(h => h === 'sname');
-                const regFacIdIdx = regHeaders.findIndex(h => h === 'facid');
-                const regFacNameIdx = regHeaders.findIndex(h => h === 'facname');
-
-                const sectionLabel = `วิชา ${regFile.courseCode} | Lec ${regFile.lecSection} | Lab ${regFile.labSection}`;
-
-                // Build set of registrar IDs
-                const regStudents = regFile.data.rows.map(row => ({
-                    id: (row[regIdIdx] || '').trim(),
-                    name: row[regNameIdx] || '',
-                    sname: row[regSnameIdx] || '',
-                    facId: regFacIdIdx >= 0 ? (row[regFacIdIdx] || '') : '',
-                    facName: regFacNameIdx >= 0 ? (row[regFacNameIdx] || '') : ''
-                })).filter(s => s.id);
-
-                const regIdSet = new Set(regStudents.map(s => s.id));
-                const canvasIdSet = new Set();
-
-                const matched = [];
-                const canvasOnly = [];
-                const regOnly = [];
-
-                // Check each Canvas student against this registrar section
-                canvasStudents.forEach(cs => {
-                    const csId = cs.sisId;
-                    if (!csId) return;
-                    if (regIdSet.has(csId)) {
-                        canvasIdSet.add(csId);
-                        const regStudent = regStudents.find(r => r.id === csId);
-                        matched.push({
-                            id: csId,
-                            canvasName: cs.name,
-                            regName: regStudent ? `${regStudent.name} ${regStudent.sname}` : '',
-                            canvasSection: cs.section,
-                            facName: regStudent?.facName || '',
-                            status: 'match',
-                            section: sectionLabel
-                        });
-                    }
-                });
-
-                // Registrar students not in Canvas
-                regStudents.forEach(rs => {
-                    const inCanvas = canvasStudents.some(cs => cs.sisId === rs.id);
-                    if (!inCanvas) {
-                        regOnly.push({
-                            id: rs.id,
-                            canvasName: '-',
-                            regName: `${rs.name} ${rs.sname}`,
-                            canvasSection: '-',
-                            facName: rs.facName,
-                            status: 'reg-only',
-                            section: sectionLabel
-                        });
-                    }
-                });
-
-                sectionResults.push({
-                    label: sectionLabel,
-                    filename: regFile.filename,
-                    courseCode: regFile.courseCode,
-                    lecSection: regFile.lecSection,
-                    labSection: regFile.labSection,
-                    matched, canvasOnly, regOnly,
-                    regTotal: regStudents.length
-                });
-
-                allEntries.push(...matched, ...regOnly);
-            });
-
-            // Now find Canvas students not in ANY registrar file
-            const allRegIds = new Set();
-            registrarFiles.forEach(rf => {
-                const regHeaders = rf.data.headers.map(h => (h || '').toLowerCase().trim());
-                const regIdIdx = regHeaders.findIndex(h => h === 'id');
-                rf.data.rows.forEach(row => {
-                    const id = (row[regIdIdx] || '').trim();
-                    if (id) allRegIds.add(id);
-                });
-            });
-
-            const canvasOnlyStudents = canvasStudents
-                .filter(cs => cs.sisId && !allRegIds.has(cs.sisId))
-                .map(cs => ({
-                    id: cs.sisId,
-                    canvasName: cs.name,
-                    regName: '-',
-                    canvasSection: cs.section,
-                    facName: '-',
-                    status: 'canvas-only',
-                    section: 'ไม่พบในทะเบียน'
-                }));
-
-            allEntries.push(...canvasOnlyStudents);
-
-            const totalMatched = allEntries.filter(e => e.status === 'match').length;
-            const totalCanvasOnly = canvasOnlyStudents.length;
-            const totalRegOnly = allEntries.filter(e => e.status === 'reg-only').length;
-
-            chkResults = {
-                sections: sectionResults,
-                allEntries,
-                canvasOnlyStudents,
-                canvasTotal: canvasStudents.length,
-                regTotal: registrarFiles.reduce((sum, f) => sum + f.data.rows.filter(r => r.some(c => c)).length, 0),
-                totalMatched,
-                totalIssues: totalCanvasOnly + totalRegOnly
-            };
-
-            // Update stats
-            document.getElementById('chkStatCanvas').textContent = canvasStudents.length;
-            document.getElementById('chkStatReg').textContent = chkResults.regTotal;
-            document.getElementById('chkStatMatch').textContent = totalMatched;
-            document.getElementById('chkStatIssue').textContent = chkResults.totalIssues;
-
-            // Render results
-            chkCurrentFilter = 'all';
+            state.check.currentFilter = 'all';
             renderCheckResults();
 
-            chkCurrentStep = 3;
+            state.check.currentStep = 3;
             updateChkSteps();
-        };
+        });
 
-        function filterCheckResults(filter) {
-            chkCurrentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.filter === filter);
-            });
-            renderCheckResults();
-        }
-
-        function renderCheckResults() {
-            if (!chkResults) return;
-            const container = document.getElementById('chkResultsContainer');
-            let entries = chkResults.allEntries;
-
-            if (chkCurrentFilter !== 'all') {
-                entries = entries.filter(e => e.status === chkCurrentFilter);
+        // Check mode: Filter buttons - event delegation
+        document.querySelector('.filter-bar').addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (btn && btn.dataset.filter) {
+                filterCheckResults(btn.dataset.filter);
             }
+        });
 
-            // Group by section
-            const grouped = {};
-            entries.forEach(e => {
-                if (!grouped[e.section]) grouped[e.section] = [];
-                grouped[e.section].push(e);
-            });
+        // Check mode: Export & Reset
+        document.getElementById('chkBtnExport').addEventListener('click', exportCheckCSV);
+        document.getElementById('chkBtnReset').addEventListener('click', resetCheckMode);
 
-            let html = '';
-            for (const [section, items] of Object.entries(grouped)) {
-                const matchCount = items.filter(i => i.status === 'match').length;
-                const canvasOnlyCount = items.filter(i => i.status === 'canvas-only').length;
-                const regOnlyCount = items.filter(i => i.status === 'reg-only').length;
-
-                html += `<div class="section-group">`;
-                html += `<div class="section-header">
-                    📋 ${section}
-                    <span class="badge badge-green">${matchCount} ตรงกัน</span>
-                    ${canvasOnlyCount > 0 ? `<span class="badge badge-yellow">${canvasOnlyCount} เฉพาะ Canvas</span>` : ''}
-                    ${regOnlyCount > 0 ? `<span class="badge badge-red">${regOnlyCount} เฉพาะทะเบียน</span>` : ''}
-                </div>`;
-                html += `<div class="table-wrap"><table>
-                    <thead><tr>
-                        <th>รหัสนักศึกษา</th>
-                        <th>ชื่อ (Canvas)</th>
-                        <th>ชื่อ (ทะเบียน)</th>
-                        <th>Section (Canvas)</th>
-                        <th>คณะ</th>
-                        <th>สถานะ</th>
-                    </tr></thead><tbody>`;
-
-                items.forEach(item => {
-                    let statusHtml = '';
-                    if (item.status === 'match') {
-                        statusHtml = '<span class="matched">✅ ปกติ</span>';
-                    } else if (item.status === 'canvas-only') {
-                        statusHtml = '<span class="not-found">⚠️ มีใน Canvas แต่ไม่มีในทะเบียน</span>';
-                    } else if (item.status === 'reg-only') {
-                        statusHtml = '<span class="not-found">❌ มีในทะเบียน แต่ไม่มีใน Canvas</span>';
-                    }
-                    html += `<tr>
-                        <td>${item.id}</td>
-                        <td>${item.canvasName}</td>
-                        <td>${item.regName}</td>
-                        <td>${item.canvasSection}</td>
-                        <td>${item.facName}</td>
-                        <td>${statusHtml}</td>
-                    </tr>`;
-                });
-
-                html += `</tbody></table></div></div>`;
-            }
-
-            if (entries.length === 0) {
-                html = '<div style="text-align:center; color:#a0aec0; padding:2rem;">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div>';
-            }
-
-            container.innerHTML = html;
-        }
-
-        // Export check results
-        document.getElementById('chkBtnExport').onclick = () => {
-            if (!chkResults) return;
-
-            const escapeCSV = (val) => {
-                const v = String(val || '');
-                return v.includes(',') || v.includes('"') || v.includes('\n') ? `"${v.replace(/"/g, '""')}"` : v;
-            };
-
-            const headers = ['รหัสนักศึกษา', 'ชื่อ (Canvas)', 'ชื่อ (ทะเบียน)', 'Section (Canvas)', 'คณะ', 'Section (ทะเบียน)', 'สถานะ'];
-            let csv = headers.map(escapeCSV).join(',') + '\n';
-
-            chkResults.allEntries.forEach(item => {
-                let statusText = '';
-                if (item.status === 'match') statusText = 'ปกติ';
-                else if (item.status === 'canvas-only') statusText = 'มีใน Canvas แต่ไม่มีในทะเบียน';
-                else if (item.status === 'reg-only') statusText = 'มีในทะเบียน แต่ไม่มีใน Canvas';
-
-                csv += [item.id, item.canvasName, item.regName, item.canvasSection, item.facName, item.section, statusText]
-                    .map(escapeCSV).join(',') + '\n';
-            });
-
-            const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `student_status_check_${new Date().toISOString().slice(0,10)}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-        };
-
-        // Check mode reset
-        document.getElementById('chkBtnReset').onclick = () => {
-            chkCanvasData = null;
-            registrarFiles = [];
-            chkResults = null;
-            chkCurrentStep = 1;
-            document.getElementById('chkCanvasZone').classList.remove('has-file');
-            document.getElementById('chkCanvasName').textContent = 'คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวาง';
-            document.getElementById('chkCanvasInfo').textContent = 'รองรับ .csv, .xlsx';
-            document.getElementById('regZone').classList.remove('has-file');
-            document.getElementById('regName').textContent = 'คลิกเพื่อเลือกไฟล์ (เลือกได้หลายไฟล์)';
-            document.getElementById('regInfo').textContent = 'รองรับ .csv, .xlsx - เลือกได้หลายไฟล์พร้อมกัน';
-            document.getElementById('regFileList').innerHTML = '';
-            document.getElementById('chkCanvasFile').value = '';
-            document.getElementById('regFiles').value = '';
-            document.getElementById('chkBtnNext1').disabled = true;
-            document.getElementById('chkBtnCompare').disabled = true;
-            document.getElementById('chkCanvasPreview').classList.add('hidden');
-            document.getElementById('chkCanvasError').classList.add('hidden');
-            document.getElementById('regError').classList.add('hidden');
-            updateChkSteps();
-        };
-
-        // Init
-        updateSteps();
+        // ========== INITIALIZATION ==========
+        updateMapSteps();
     </script>
 </body>
 </html>
