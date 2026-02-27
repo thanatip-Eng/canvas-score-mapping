@@ -5,7 +5,16 @@
       "Bash(npx:*)",
       "Bash(curl:*)",
       "Bash(node -e:*)",
-      "Bash(node /tmp/validate_ids.js:*)"
+      "Bash(node /tmp/validate_ids.js:*)",
+      "Bash(git clone:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm install:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(wc:*)",
+      "Bash(npm run build:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
