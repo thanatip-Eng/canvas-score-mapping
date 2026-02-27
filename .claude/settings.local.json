@@ -14,7 +14,12 @@
       "Bash(head:*)",
       "Bash(wc:*)",
       "Bash(npm run build:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(command -v:*)",
+      "Bash(lsof:*)",
+      "Bash(npm run dev:*)",
+      "Bash(./node_modules/.bin/tsc:*)",
+      "Bash(/Users/thanatip/Documents/GitHub/canvas-tools/node_modules/.bin/tsc:*)"
     ]
   }
 }
