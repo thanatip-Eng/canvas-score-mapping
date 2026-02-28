@@ -19,7 +19,8 @@
       "Bash(lsof:*)",
       "Bash(npm run dev:*)",
       "Bash(./node_modules/.bin/tsc:*)",
-      "Bash(/Users/thanatip/Documents/GitHub/canvas-tools/node_modules/.bin/tsc:*)"
+      "Bash(/Users/thanatip/Documents/GitHub/canvas-tools/node_modules/.bin/tsc:*)",
+      "Bash(python3 -c:*)"
     ]
   }
 }
